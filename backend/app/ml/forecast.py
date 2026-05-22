@@ -28,11 +28,15 @@ def forecast_holt_winters(series: pd.Series, steps: int = 8) -> pd.DataFrame:
         )
         fit = model.fit(optimized=True)
         fc = fit.forecast(steps)
-        resid_std = float(np.nanstd(series.values - fit.fittedvalues)) or 2.5
+        resid = series.values - fit.fittedvalues
+        # Use IQR-based robust std (less sensitive to outliers in noisy weekly data)
+        resid_std = float(np.nanpercentile(np.abs(resid), 75)) * 1.4826 or 2.5
+        # Cap to a reasonable demo-friendly band (no wider than ±8 pp)
+        resid_std = min(resid_std, 5.0)
         out = pd.DataFrame({
             "forecast": np.maximum(0.0, fc).round(2),
-            "low": np.maximum(0.0, fc - 1.96 * resid_std).round(2),
-            "high": (fc + 1.96 * resid_std).round(2),
+            "low": np.maximum(0.0, fc - 1.28 * resid_std).round(2),  # ~80% CI
+            "high": (fc + 1.28 * resid_std).round(2),
         })
         return out
     except Exception as e:

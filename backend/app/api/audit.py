@@ -8,8 +8,9 @@ router = APIRouter(prefix="/audit", tags=["audit"])
 
 
 @router.get("/ai_outputs")
-async def ai_outputs(type: Optional[str] = None, hcp_id: Optional[str] = None, limit: int = 50):
-    items = await list_ai_outputs(type_=type, hcp_id=hcp_id, limit=limit)
+async def ai_outputs(type: Optional[str] = None, hcp_id: Optional[str] = None,
+                     limit: int = 50, include_payload: bool = False):
+    items = await list_ai_outputs(type_=type, hcp_id=hcp_id, limit=limit, include_payload=include_payload)
     return {"total": len(items), "items": items}
 
 

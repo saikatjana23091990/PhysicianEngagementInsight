@@ -47,8 +47,12 @@ async def ensure_indexes() -> None:
     db = get_db()
     await db.ai_outputs.create_index([("type", 1), ("created_at", -1)])
     await db.ai_outputs.create_index([("hcp_id", 1)])
+    # TTL: auto-expire AI outputs after 90 days (created_at is ISO string — Mongo's TTL needs Date,
+    # so we add a parallel `created_at_dt` BSON date for the TTL only)
+    await db.ai_outputs.create_index([("created_at_dt", 1)], expireAfterSeconds=90 * 24 * 3600)
     await db.audit_logs.create_index([("category", 1), ("created_at", -1)])
     await db.audit_logs.create_index([("subject_id", 1)])
+    await db.audit_logs.create_index([("created_at_dt", 1)], expireAfterSeconds=365 * 24 * 3600)
     await db.rag_chunks.create_index([("source_type", 1), ("hcp_id", 1)])
     await db.rag_chunks.create_index([("source_id", 1)], unique=False)
     logger.info("Mongo indexes ensured.")
@@ -68,6 +72,7 @@ async def log_ai_output(
     citations: Optional[list] = None,
 ) -> str:
     from datetime import datetime, timezone
+    now = datetime.now(timezone.utc)
     doc = {
         "type": type_,
         "hcp_id": hcp_id,
@@ -78,7 +83,8 @@ async def log_ai_output(
         "fallback_used": fallback_used,
         "citations": citations or [],
         "payload": payload,
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": now.isoformat(),
+        "created_at_dt": now,  # for TTL index
     }
     db = get_db()
     res = await db.ai_outputs.insert_one(doc)
@@ -98,15 +104,38 @@ async def log_audit(category: str, subject_id: str, action: str, detail: dict) -
     return str(res.inserted_id)
 
 
-async def list_ai_outputs(type_: Optional[str] = None, hcp_id: Optional[str] = None, limit: int = 50) -> list:
+async def list_ai_outputs(type_: Optional[str] = None, hcp_id: Optional[str] = None, limit: int = 50,
+                          include_payload: bool = False) -> list:
+    """List AI outputs. Payload is omitted by default to keep responses small;
+    set include_payload=True to fetch full markdown bodies."""
     db = get_db()
     q: dict = {}
     if type_:
         q["type"] = type_
     if hcp_id:
         q["hcp_id"] = hcp_id
-    cur = db.ai_outputs.find(q, {"_id": 0}).sort("created_at", -1).limit(limit)
-    return [doc async for doc in cur]
+    projection = {"_id": 0, "created_at_dt": 0}
+    if not include_payload:
+        projection["payload"] = 0
+    cur = db.ai_outputs.find(q, projection).sort("created_at", -1).limit(limit)
+    items = [doc async for doc in cur]
+    if not include_payload:
+        # Attach a short answer preview from payload without re-hydrating it.
+        # We re-query just the small text snippets when needed.
+        ids = []
+        full_cur = db.ai_outputs.find(q, {"_id": 0, "payload.answer_markdown": 1,
+                                          "payload.brief_markdown": 1,
+                                          "payload.narrative_markdown": 1,
+                                          "created_at": 1}).sort("created_at", -1).limit(limit)
+        async for d in full_cur:
+            p = d.get("payload") or {}
+            snippet = (p.get("answer_markdown") or p.get("brief_markdown") or p.get("narrative_markdown") or "")
+            ids.append((d.get("created_at"), snippet[:280]))
+        # zip by created_at to attach
+        snippets = {ca: s for ca, s in ids}
+        for it in items:
+            it["preview"] = snippets.get(it.get("created_at"), "")
+    return items
 
 
 async def list_audit_logs(category: Optional[str] = None, subject_id: Optional[str] = None, limit: int = 100) -> list:
