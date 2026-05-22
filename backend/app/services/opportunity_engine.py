@@ -225,13 +225,47 @@ class OpportunityEngine:
         if row.empty:
             return {}
         r = row.iloc[0].to_dict()
+
+        # SHAP contributions for this HCP
+        from app.ml.propensity import get_propensity_model, FEATURES
+        feats = self.build_features()
+        f_row = feats[feats["hcp_id"] == hcp_id]
+        shap_breakdown = []
+        ml_meta = None
+        if not f_row.empty:
+            model = get_propensity_model(feats)
+            ml_meta = {
+                "status": model.status,
+                "auc_cv": round(model.auc, 3) if model.auc is not None else None,
+                "global_importance": {k: round(v, 4) for k, v in model.feature_importance.items()},
+            }
+            contribs = model.shap_contributions(f_row)
+            if contribs.size:
+                row_contribs = contribs[0]
+                bias = float(row_contribs[-1])
+                pairs = list(zip(FEATURES, row_contribs[:-1].tolist()))
+                pairs.sort(key=lambda x: -abs(x[1]))
+                shap_breakdown = [
+                    {"feature": _pretty(k), "raw_feature": k,
+                     "value": float(f_row.iloc[0][k]),
+                     "shap": round(float(v), 4),
+                     "direction": "positive" if v > 0 else "negative"}
+                    for k, v in pairs
+                ]
+                ml_meta["bias"] = round(bias, 4)
+                ml_meta["log_odds"] = round(bias + float(row_contribs[:-1].sum()), 4)
+
         return {
             "hcp_id": hcp_id,
             "opportunity_score": r["opportunity_score"],
+            "ml_propensity": r.get("ml_propensity"),
+            "rule_score": r.get("rule_score"),
             "confidence": r["score_confidence"],
             "recommendation": self._rule_engine(r),
             "drivers": self._top_drivers(r),
             "suppressors": self._suppressors(r),
+            "shap": shap_breakdown,
+            "ml_meta": ml_meta,
         }
 
     def _rule_engine(self, r: dict) -> dict:
@@ -303,3 +337,20 @@ class OpportunityEngine:
         if r.get("saturation"):
             sup.append({"factor": "Engagement saturation", "impact": "Medium"})
         return sup
+
+
+def _pretty(k: str) -> str:
+    return {
+        "rx_recent": "Rx (last 90d)",
+        "rx_prior": "Rx (prior 90d)",
+        "rx_growth": "Rx growth ratio",
+        "calls_90d": "Calls (90d)",
+        "digital_90d": "Digital engagement (90d)",
+        "pub_count_12m": "Publications (12m)",
+        "pub_relevance_avg": "Publication relevance",
+        "event_score_avg": "Event engagement",
+        "kol_influence": "KOL influence",
+        "kol_centrality": "Network centrality",
+        "event_urgency": "Market-event urgency",
+        "hcp_hist_conv_rate": "Historical conversion",
+    }.get(k, k)

@@ -3,7 +3,8 @@ import {
   Box, Card, CardContent, Grid, Typography, Stack, Chip, Tab, Tabs,
 } from "@mui/material";
 import {
-  ResponsiveContainer, LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ComposedChart,
+  ResponsiveContainer, LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis,
+  CartesianGrid, Tooltip, Legend, Cell, ComposedChart, ReferenceLine, ReferenceArea,
 } from "recharts";
 import { Conversion } from "../services/api";
 import SectionHeader from "../components/SectionHeader";
@@ -13,7 +14,7 @@ import { palette, chartPalette } from "../theme/kiwiTheme";
 
 export default function ConversionAnalytics() {
   const [trend, setTrend] = useState([]);
-  const [forecast, setForecast] = useState([]);
+  const [forecast, setForecast] = useState(null);
   const [overview, setOverview] = useState(null);
   const [byRep, setByRep] = useState([]);
   const [byTherapy, setByTherapy] = useState([]);
@@ -29,16 +30,25 @@ export default function ConversionAnalytics() {
     Conversion.heatmap().then(setHeat);
   }, []);
 
-  if (!overview || !trend.length) return <LoadingState label="Loading conversion analytics…" />;
+  if (!overview || !trend.length || !forecast) return <LoadingState label="Loading conversion analytics…" />;
 
-  const trendWithForecast = [
-    ...trend.map((t) => ({ ...t, forecast: null })),
-    ...forecast.map((f) => ({
-      bucket: f.bucket, total_calls: null, conversion_rate: null,
-      rolling_7d: null, rolling_30d: null,
-      forecast: f.forecast_rate, low: f.confidence_low, high: f.confidence_high,
+  // Build combined volume chart (history + forecast for total_calls vs converted_calls)
+  const volumeData = [
+    ...forecast.history.map((h) => ({
+      bucket: h.bucket,
+      total_calls: h.total_calls,
+      converted_calls: h.converted_calls,
+    })),
+    ...forecast.forecast.map((f) => ({
+      bucket: f.bucket,
+      total_forecast: f.total_forecast,
+      total_band: [f.total_low, f.total_high],
+      converted_forecast: f.converted_forecast,
+      converted_band: [f.converted_low, f.converted_high],
     })),
   ];
+  const convBucket = forecast.convergence?.bucket;
+  const direction = forecast.convergence?.direction;
 
   return (
     <Box>
@@ -64,33 +74,67 @@ export default function ConversionAnalytics() {
         </Grid>
       </Grid>
 
-      <Card sx={{ mb: 2 }}>
+      <Card sx={{ mb: 2 }} data-testid="forecast-chart">
         <CardContent>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-            <Typography variant="h6" sx={{ fontFamily: "Sora" }}>Conversion Trend with 8-week Forecast</Typography>
+          <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 1 }}>
+            <Box>
+              <Typography variant="h6" sx={{ fontFamily: "Sora" }}>Total Calls vs Converted Calls — 8-week Forecast</Typography>
+              <Typography variant="caption" sx={{ color: palette.textMuted }}>
+                The gap between the two lines is the conversion opportunity. Watch for narrowing (improving) vs widening (worsening).
+              </Typography>
+            </Box>
             <Stack direction="row" spacing={1}>
-              <Chip size="small" label="Actual rate" sx={{ bgcolor: "rgba(2,129,116,0.12)", color: palette.primary }} />
-              <Chip size="small" label="30d rolling" sx={{ bgcolor: "rgba(146,222,139,0.4)", color: palette.primaryDark }} />
-              <Chip size="small" label="Forecast" sx={{ bgcolor: palette.cream, color: palette.primaryDark }} />
+              <Chip size="small" label="Total calls" sx={{ bgcolor: "rgba(2,129,116,0.12)", color: palette.primary, fontWeight: 700 }} />
+              <Chip size="small" label="Converted calls" sx={{ bgcolor: "rgba(10,182,139,0.18)", color: palette.primary, fontWeight: 700 }} />
+              <Chip size="small" label="Forecast band" sx={{ bgcolor: palette.cream, color: palette.primaryDark, fontWeight: 700 }} />
             </Stack>
           </Stack>
-          <Box sx={{ height: 340 }}>
+          {forecast.convergence && (
+            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ my: 1.5, p: 1.5, bgcolor: palette.surfaceAlt, borderRadius: 2 }}>
+              <Box sx={{ width: 10, height: 10, borderRadius: "50%",
+                bgcolor: direction === "narrowing" ? palette.accent : direction === "widening" ? palette.danger : palette.cream }} />
+              <Typography variant="body2">
+                <b>Trend is {direction}.</b> Current gap: <b>{forecast.convergence.current_gap}</b> calls/week ·
+                Forecast min gap: <b>{forecast.convergence.min_gap?.toFixed(1)}</b> at <b>{convBucket?.slice(0, 10)}</b>
+              </Typography>
+            </Stack>
+          )}
+          <Box sx={{ height: 360 }}>
             <ResponsiveContainer>
-              <ComposedChart data={trendWithForecast}>
+              <ComposedChart data={volumeData}>
                 <defs>
-                  <linearGradient id="conv" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="totalArea" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor={palette.primary} stopOpacity={0.35} />
                     <stop offset="100%" stopColor={palette.primary} stopOpacity={0.02} />
+                  </linearGradient>
+                  <linearGradient id="convArea" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={palette.accent} stopOpacity={0.35} />
+                    <stop offset="100%" stopColor={palette.accent} stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E4ECE6" />
                 <XAxis dataKey="bucket" tickFormatter={(v) => v?.slice(5, 10)} tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} unit="%" />
+                <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip />
                 <Legend />
-                <Area dataKey="rolling_30d" stroke={palette.light} fill="url(#conv)" strokeWidth={2} />
-                <Line dataKey="rolling_7d" stroke={palette.primary} strokeWidth={2.5} dot={false} />
-                <Line dataKey="forecast" stroke={palette.cream} strokeWidth={3} strokeDasharray="5 5" dot={{ fill: palette.cream, r: 3 }} />
+                {/* Historical actuals */}
+                <Area type="monotone" dataKey="total_calls" stroke={palette.primary} fill="url(#totalArea)" strokeWidth={2.5} name="Total calls (actual)" />
+                <Area type="monotone" dataKey="converted_calls" stroke={palette.accent} fill="url(#convArea)" strokeWidth={2.5} name="Converted calls (actual)" />
+                {/* Forecast confidence bands */}
+                <Area type="monotone" dataKey="total_band" stroke="none" fill={palette.primary} fillOpacity={0.08} name="Total band" legendType="none" />
+                <Area type="monotone" dataKey="converted_band" stroke="none" fill={palette.accent} fillOpacity={0.1} name="Converted band" legendType="none" />
+                {/* Forecast lines (dashed) */}
+                <Line type="monotone" dataKey="total_forecast" stroke={palette.primary} strokeWidth={2.5} strokeDasharray="5 4" dot={{ fill: palette.primary, r: 3 }} name="Total (forecast)" />
+                <Line type="monotone" dataKey="converted_forecast" stroke={palette.accent} strokeWidth={2.5} strokeDasharray="5 4" dot={{ fill: palette.accent, r: 3 }} name="Converted (forecast)" />
+                {convBucket && (
+                  <ReferenceLine x={convBucket} stroke={palette.cream} strokeWidth={2}
+                    label={{ value: "Min-gap week", position: "top", fill: palette.primaryDark, fontSize: 11, fontWeight: 700 }} />
+                )}
+                {/* Forecast region tint */}
+                {forecast.forecast.length > 0 && (
+                  <ReferenceArea x1={forecast.forecast[0].bucket} x2={forecast.forecast.slice(-1)[0].bucket}
+                    fill={palette.cream} fillOpacity={0.18} />
+                )}
               </ComposedChart>
             </ResponsiveContainer>
           </Box>

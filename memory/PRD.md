@@ -39,6 +39,11 @@ Build a production-quality, demo-ready, enterprise-scalable commercial analytics
 - AWS Bedrock provider with bearer token + Emergent fallback
 - Kiwi-themed UI (#028174 / #0AB68B / #92DE8B / #FFE3B3)
 
+### Iteration 3 (2026-05-22)
+- **Interactive Executive Dashboard filters** — Specialty / Territory / Region / Time window dropdowns; `/api/exec/dashboard` accepts query params and recomputes KPIs, trend, breakdowns, and top opportunities; reset icon + active-filter chip count
+- **Dual-line forecast** — `/api/conversion/forecast` now forecasts both `total_calls` and `converted_calls` with Holt-Winters + confidence bands; convergence analysis (current gap, forecast min gap, direction = narrowing / widening / stable); new chart renders both lines with forecast region tint and reference line at min-gap week
+- **SHAP in NBA drawer** — XGBoost `pred_contribs` exposes per-HCP feature contributions on `/api/nba/explain/{hcp_id}`; new SHAP card in the drawer with horizontal bar chart (teal=positive lift, red=negative drag), ML/Rule score chips, model AUC and log-odds shown
+
 ### Iteration 2 (2026-05-22)
 - **Mongo persistence** for AI outputs (chat, briefing, narrative) + audit_logs collection with TTL indexes
 - **Mongo-backed vector store** (Atlas $vectorSearch compatible) with 295 chunks at startup

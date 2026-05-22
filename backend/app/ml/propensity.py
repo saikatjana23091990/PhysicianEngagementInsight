@@ -77,6 +77,20 @@ class PropensityModel:
         X = features[FEATURES].fillna(0).values
         return self.model.predict_proba(X)[:, 1]
 
+    def shap_contributions(self, features: pd.DataFrame) -> np.ndarray:
+        """Per-row SHAP contributions using XGBoost's native pred_contribs.
+        Returns array shape (N, F+1) where last column is the bias term."""
+        if not self.fitted or self.model is None:
+            return np.zeros((len(features), len(FEATURES) + 1))
+        try:
+            import xgboost as xgb
+            X = features[FEATURES].fillna(0).values
+            dmat = xgb.DMatrix(X, feature_names=FEATURES)
+            contrib = self.model.get_booster().predict(dmat, pred_contribs=True)
+            return contrib
+        except Exception:
+            return np.zeros((len(features), len(FEATURES) + 1))
+
 
 _singleton: Optional[PropensityModel] = None
 

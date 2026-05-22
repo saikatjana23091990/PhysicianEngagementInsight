@@ -92,22 +92,74 @@ def audit(interaction_id: str):
 
 @router.get("/forecast")
 def forecast(weeks_ahead: int = 8):
-    """Holt-Winters forecast on weekly conversion rate with EWM fallback."""
+    """Forecasts TWO series: total_calls/week and converted_calls/week.
+    Returns each point's forecast values, CIs, derived rate, and the convergence
+    week (where forecasted converted_calls would approach total_calls — i.e. 100%
+    conversion would be implausible; we annotate the implied convergence-of-trends
+    week as where rate >= 50%, plus distance-closing week)."""
     import pandas as pd
     from app.ml.forecast import forecast_holt_winters
     eng = ConversionEngine()
     df = eng.trend(freq="W")
     if df.empty:
-        return []
-    series = pd.Series(df["conversion_rate"].values, index=df["bucket"])
-    fc = forecast_holt_winters(series, steps=weeks_ahead)
+        return {"history": [], "forecast": [], "convergence": None}
+
     last = df["bucket"].iloc[-1]
-    out = []
-    for i, (_, row) in enumerate(fc.iterrows(), start=1):
-        out.append({
-            "bucket": (last + pd.Timedelta(weeks=i)).isoformat(),
-            "forecast_rate": float(row["forecast"]),
-            "confidence_low": float(row["low"]),
-            "confidence_high": float(row["high"]),
+    total_series = pd.Series(df["total_calls"].astype(float).values, index=df["bucket"])
+    conv_series = pd.Series(df["converted_calls"].astype(float).values, index=df["bucket"])
+    fc_total = forecast_holt_winters(total_series, steps=weeks_ahead)
+    fc_conv = forecast_holt_winters(conv_series, steps=weeks_ahead)
+
+    history = [
+        {
+            "bucket": r["bucket"].isoformat(),
+            "total_calls": int(r["total_calls"]),
+            "converted_calls": int(r["converted_calls"]),
+            "conversion_rate": float(r["conversion_rate"]),
+        }
+        for _, r in df.iterrows()
+    ]
+
+    forecast_points = []
+    convergence_week = None
+    convergence_gap_min = None
+    for i, ((_, tr), (_, cr)) in enumerate(zip(fc_total.iterrows(), fc_conv.iterrows()), start=1):
+        bucket = (last + pd.Timedelta(weeks=i)).isoformat()
+        total_f = max(0.0, float(tr["forecast"]))
+        conv_f = max(0.0, min(float(cr["forecast"]), total_f))  # cannot exceed total
+        rate = round(100.0 * conv_f / total_f, 2) if total_f > 0 else 0.0
+        gap = total_f - conv_f
+        forecast_points.append({
+            "bucket": bucket,
+            "total_forecast": round(total_f, 2),
+            "total_low": round(max(0.0, float(tr["low"])), 2),
+            "total_high": round(float(tr["high"]), 2),
+            "converted_forecast": round(conv_f, 2),
+            "converted_low": round(max(0.0, float(cr["low"])), 2),
+            "converted_high": round(float(cr["high"]), 2),
+            "implied_rate": rate,
+            "gap": round(gap, 2),
         })
-    return out
+        if convergence_gap_min is None or gap < convergence_gap_min:
+            convergence_gap_min = gap
+            convergence_week = bucket
+
+    # convergence interpretation
+    last_hist = history[-1] if history else {"total_calls": 0, "converted_calls": 0}
+    last_gap = (last_hist["total_calls"] or 0) - (last_hist["converted_calls"] or 0)
+    final_forecast = forecast_points[-1] if forecast_points else None
+    direction = (
+        "narrowing" if final_forecast and final_forecast["gap"] < last_gap
+        else ("widening" if final_forecast and final_forecast["gap"] > last_gap else "stable")
+    )
+
+    return {
+        "history": history,
+        "forecast": forecast_points,
+        "convergence": {
+            "bucket": convergence_week,
+            "min_gap": convergence_gap_min,
+            "current_gap": last_gap,
+            "direction": direction,
+        },
+    }

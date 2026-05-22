@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import {
   Grid, Card, CardContent, Typography, Box, Stack, Chip, Button, Divider, Paper,
   Table, TableHead, TableRow, TableCell, TableBody, LinearProgress,
+  MenuItem, Select, FormControl, InputLabel, IconButton, Tooltip as MTooltip,
 } from "@mui/material";
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
 import PictureAsPdfRoundedIcon from "@mui/icons-material/PictureAsPdfRounded";
+import RestartAltRoundedIcon from "@mui/icons-material/RestartAltRounded";
 import ReactMarkdown from "react-markdown";
 import {
   AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, BarChart, Bar, CartesianGrid, Legend, Cell,
@@ -20,10 +22,20 @@ export default function ExecutiveDashboard() {
   const [narrative, setNarrative] = useState(null);
   const [narrLoading, setNarrLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [filterOpts, setFilterOpts] = useState({ specialties: [], territories: [], regions: [], time_windows: [] });
+  const [filters, setFilters] = useState({ specialty: "", territory: "", region: "", time_window_days: "" });
+
+  useEffect(() => { ExecDash.filters().then(setFilterOpts).catch(console.error); }, []);
 
   useEffect(() => {
-    ExecDash.dashboard().then(setData).catch(console.error);
-  }, []);
+    const params = {};
+    if (filters.specialty) params.specialty = filters.specialty;
+    if (filters.territory) params.territory = filters.territory;
+    if (filters.region) params.region = filters.region;
+    if (filters.time_window_days) params.time_window_days = filters.time_window_days;
+    setData(null);
+    ExecDash.dashboard(params).then(setData).catch(console.error);
+  }, [filters]);
 
   const generateNarrative = async () => {
     setNarrLoading(true);
@@ -47,6 +59,9 @@ export default function ExecutiveDashboard() {
       setPdfLoading(false);
     }
   };
+
+  const resetFilters = () => setFilters({ specialty: "", territory: "", region: "", time_window_days: "" });
+  const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
   if (!data) return <LoadingState label="Loading executive view…" />;
 
@@ -84,6 +99,58 @@ export default function ExecutiveDashboard() {
           </Stack>
         }
       />
+
+      {/* Filter bar */}
+      <Card sx={{ mb: 2.5 }} data-testid="exec-filter-bar">
+        <CardContent sx={{ py: 1.5 }}>
+          <Stack direction={{ xs: "column", md: "row" }} spacing={1.2} alignItems={{ md: "center" }}>
+            <Typography variant="overline" sx={{ color: palette.textMuted, mr: 1 }}>Filters</Typography>
+            <FormControl size="small" sx={{ minWidth: 160 }}>
+              <InputLabel>Specialty</InputLabel>
+              <Select label="Specialty" value={filters.specialty} onChange={(e) => setFilters({ ...filters, specialty: e.target.value })} data-testid="filter-specialty">
+                <MenuItem value=""><em>All</em></MenuItem>
+                {filterOpts.specialties.map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
+              </Select>
+            </FormControl>
+            <FormControl size="small" sx={{ minWidth: 140 }}>
+              <InputLabel>Territory</InputLabel>
+              <Select label="Territory" value={filters.territory} onChange={(e) => setFilters({ ...filters, territory: e.target.value })} data-testid="filter-territory">
+                <MenuItem value=""><em>All</em></MenuItem>
+                {filterOpts.territories.map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
+              </Select>
+            </FormControl>
+            <FormControl size="small" sx={{ minWidth: 140 }}>
+              <InputLabel>Region</InputLabel>
+              <Select label="Region" value={filters.region} onChange={(e) => setFilters({ ...filters, region: e.target.value })} data-testid="filter-region">
+                <MenuItem value=""><em>All</em></MenuItem>
+                {filterOpts.regions.map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
+              </Select>
+            </FormControl>
+            <FormControl size="small" sx={{ minWidth: 180 }}>
+              <InputLabel>Time window</InputLabel>
+              <Select label="Time window" value={filters.time_window_days} onChange={(e) => setFilters({ ...filters, time_window_days: e.target.value })} data-testid="filter-time">
+                <MenuItem value=""><em>All time</em></MenuItem>
+                {filterOpts.time_windows.filter(w => w.value > 0).map((w) => <MenuItem key={w.value} value={w.value}>{w.label}</MenuItem>)}
+              </Select>
+            </FormControl>
+            <Box sx={{ flex: 1 }} />
+            {activeFilterCount > 0 && (
+              <Chip
+                label={`${activeFilterCount} filter${activeFilterCount > 1 ? "s" : ""} active`}
+                size="small"
+                sx={{ bgcolor: palette.cream, color: palette.primaryDark, fontWeight: 700 }}
+              />
+            )}
+            <MTooltip title="Reset filters">
+              <span>
+                <IconButton size="small" onClick={resetFilters} disabled={activeFilterCount === 0} data-testid="filter-reset">
+                  <RestartAltRoundedIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </MTooltip>
+          </Stack>
+        </CardContent>
+      </Card>
 
       <Grid container spacing={2.5} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>

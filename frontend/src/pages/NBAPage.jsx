@@ -8,6 +8,9 @@ import SectionHeader from "../components/SectionHeader";
 import LoadingState from "../components/LoadingState";
 import { palette } from "../theme/kiwiTheme";
 import { Link } from "react-router-dom";
+import {
+  BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, ReferenceLine, Tooltip as RTooltip,
+} from "recharts";
 
 export default function NBAPage() {
   const [items, setItems] = useState([]);
@@ -201,6 +204,88 @@ export default function NBAPage() {
                 )}
               </CardContent>
             </Card>
+
+            {selected.shap?.length > 0 && (
+              <Card sx={{ mt: 2 }} data-testid="shap-card">
+                <CardContent>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+                    <Box>
+                      <Typography variant="overline" sx={{ color: palette.textMuted }}>ML Model Explanation (SHAP)</Typography>
+                      <Typography variant="caption" sx={{ display: "block", color: palette.textMuted }}>
+                        How each feature shifted the XGBoost log-odds for this HCP.
+                      </Typography>
+                    </Box>
+                    <Stack direction="row" spacing={0.5}>
+                      <Chip size="small" label={`ML: ${selected.ml_propensity?.toFixed(0)}%`}
+                        sx={{ bgcolor: palette.primary, color: "#fff", fontWeight: 700 }} />
+                      <Chip size="small" label={`Rule: ${selected.rule_score?.toFixed(0)}`}
+                        sx={{ bgcolor: palette.cream, color: palette.primaryDark, fontWeight: 700 }} />
+                    </Stack>
+                  </Stack>
+                  {selected.ml_meta?.auc_cv != null && (
+                    <Typography variant="caption" sx={{ color: palette.textMuted }}>
+                      Model AUC (CV): <b>{selected.ml_meta.auc_cv}</b> · log-odds: <b>{selected.ml_meta.log_odds}</b>
+                    </Typography>
+                  )}
+                  <Box sx={{ height: Math.max(220, selected.shap.length * 24), mt: 1 }}>
+                    <ResponsiveContainer>
+                      <BarChart
+                        data={selected.shap.slice(0, 10)}
+                        layout="vertical"
+                        margin={{ top: 4, right: 30, left: 10, bottom: 4 }}
+                      >
+                        <XAxis type="number" tick={{ fontSize: 10 }}
+                          domain={[
+                            (dataMin) => Math.min(dataMin, -0.05),
+                            (dataMax) => Math.max(dataMax, 0.05),
+                          ]} />
+                        <YAxis
+                          type="category"
+                          dataKey="feature"
+                          tick={{ fontSize: 11 }}
+                          width={130}
+                          interval={0}
+                        />
+                        <RTooltip
+                          content={({ active, payload }) => {
+                            if (!active || !payload?.length) return null;
+                            const p = payload[0].payload;
+                            return (
+                              <Box sx={{ bgcolor: "#fff", p: 1, border: `1px solid ${palette.border}`, borderRadius: 1, fontSize: 12 }}>
+                                <Box sx={{ fontWeight: 700 }}>{p.feature}</Box>
+                                <Box>SHAP: <b style={{ color: p.shap > 0 ? palette.primary : palette.danger }}>
+                                  {p.shap > 0 ? "+" : ""}{p.shap}
+                                </b></Box>
+                                <Box>Feature value: {typeof p.value === "number" ? p.value.toFixed(2) : p.value}</Box>
+                                <Box sx={{ color: palette.textMuted, fontSize: 10, mt: 0.5 }}>
+                                  {p.shap > 0 ? "Pushes prediction UP" : "Pushes prediction DOWN"}
+                                </Box>
+                              </Box>
+                            );
+                          }}
+                        />
+                        <ReferenceLine x={0} stroke={palette.border} />
+                        <Bar dataKey="shap" radius={[0, 4, 4, 0]}>
+                          {selected.shap.slice(0, 10).map((d, i) => (
+                            <Cell key={i} fill={d.shap > 0 ? palette.primary : palette.danger} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </Box>
+                  <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                    <Stack direction="row" spacing={0.5} alignItems="center">
+                      <Box sx={{ width: 10, height: 10, borderRadius: "2px", bgcolor: palette.primary }} />
+                      <Typography variant="caption">Positive (lift)</Typography>
+                    </Stack>
+                    <Stack direction="row" spacing={0.5} alignItems="center">
+                      <Box sx={{ width: 10, height: 10, borderRadius: "2px", bgcolor: palette.danger }} />
+                      <Typography variant="caption">Negative (drag)</Typography>
+                    </Stack>
+                  </Stack>
+                </CardContent>
+              </Card>
+            )}
           </Box>
         )}
       </Drawer>

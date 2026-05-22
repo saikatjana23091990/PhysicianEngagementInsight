@@ -132,6 +132,7 @@ export const Export = {
 };
 
 export const ExecDash = {
-  dashboard: () => api.get("/exec/dashboard").then((r) => r.data),
+  dashboard: (params) => api.get("/exec/dashboard", { params }).then((r) => r.data),
   narrative: () => api.post("/exec/narrative").then((r) => r.data),
+  filters: () => api.get("/exec/filters").then((r) => r.data),
 };
