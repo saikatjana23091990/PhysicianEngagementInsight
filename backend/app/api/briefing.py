@@ -14,7 +14,7 @@ class BriefRequest(BaseModel):
 @router.post("/generate")
 async def generate(req: BriefRequest):
     svc = BriefingService()
-    out = await svc.generate_brief(req.hcp_id)
+    out = await svc.generate_brief_with_audit(req.hcp_id)
     if out.get("error"):
         raise HTTPException(404, out["error"])
     return out

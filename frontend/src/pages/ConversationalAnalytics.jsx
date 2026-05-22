@@ -26,23 +26,48 @@ export default function ConversationalAnalytics() {
     setMessages((m) => [...m, { role: "user", content: q }]);
     setInput("");
     setLoading(true);
-    try {
-      const res = await Chat.ask(q, messages.slice(-6), sessionId.current);
-      setMessages((m) => [...m, {
-        role: "assistant",
-        content: res.answer_markdown,
-        meta: {
-          provider: res.provider,
-          latency: res.latency_ms,
-          sources: res.retrieved_sources,
-          fallback: res.fallback_used,
-        },
-      }]);
-    } catch (e) {
-      setMessages((m) => [...m, { role: "assistant", content: `Error: ${e.message}` }]);
-    } finally {
-      setLoading(false);
-    }
+
+    // Insert empty assistant message we'll stream into
+    const idx = messages.length + 1; // we just added user
+    setMessages((m) => [...m, { role: "assistant", content: "", streaming: true }]);
+
+    let sources = [];
+    let provider = null;
+    let latency = null;
+
+    await Chat.askStream(
+      q,
+      messages.slice(-6),
+      (meta) => { sources = meta.retrieved || []; },
+      (delta) => {
+        setMessages((m) => {
+          const copy = [...m];
+          if (copy[idx]) copy[idx] = { ...copy[idx], content: (copy[idx].content || "") + delta };
+          return copy;
+        });
+      },
+      (done) => {
+        provider = done.provider;
+        latency = done.latency_ms;
+        setMessages((m) => {
+          const copy = [...m];
+          if (copy[idx]) copy[idx] = {
+            ...copy[idx],
+            streaming: false,
+            meta: { provider, latency, sources, audit_id: done.audit_id, fallback: false },
+          };
+          return copy;
+        });
+      },
+      (err) => {
+        setMessages((m) => {
+          const copy = [...m];
+          if (copy[idx]) copy[idx] = { role: "assistant", content: "Error: " + (err.message || "stream failed") };
+          return copy;
+        });
+      }
+    );
+    setLoading(false);
   };
 
   return (
@@ -83,7 +108,7 @@ export default function ConversationalAnalytics() {
                     }}
                     data-testid={`chat-msg-${i}`}
                   >
-                    <ReactMarkdown>{m.content}</ReactMarkdown>
+                    <ReactMarkdown>{m.content || (m.streaming ? "▌" : "")}</ReactMarkdown>
                     {m.meta && (
                       <Stack direction="row" spacing={0.5} flexWrap="wrap" sx={{ mt: 1 }}>
                         <Chip size="small" label={m.meta.provider} sx={{ bgcolor: palette.surfaceAlt, fontSize: 10 }} />
@@ -91,6 +116,12 @@ export default function ConversationalAnalytics() {
                         {m.meta.fallback && <Chip size="small" label="fallback" color="warning" sx={{ fontSize: 10 }} />}
                         {m.meta.sources?.length > 0 && (
                           <Chip size="small" label={`${m.meta.sources.length} sources`} sx={{ bgcolor: palette.cream, color: palette.primaryDark, fontSize: 10, fontWeight: 700 }} />
+                        )}
+                        {m.meta.audit_id && (
+                          <Chip size="small" label={`audit: ${m.meta.audit_id.slice(-6)}`}
+                            sx={{ bgcolor: palette.surfaceAlt, fontFamily: "JetBrains Mono", fontSize: 10 }}
+                            data-testid="chat-audit-chip"
+                          />
                         )}
                       </Stack>
                     )}

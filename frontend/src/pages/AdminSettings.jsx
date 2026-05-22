@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Box, Card, CardContent, Grid, Typography, Chip, Stack, Divider, Paper, Avatar } from "@mui/material";
+import { Box, Card, CardContent, Grid, Typography, Chip, Stack, Divider, Paper, Avatar, Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
 import SecurityRoundedIcon from "@mui/icons-material/SecurityRounded";
 import CloudRoundedIcon from "@mui/icons-material/CloudRounded";
 import StorageRoundedIcon from "@mui/icons-material/StorageRounded";
 import PsychologyRoundedIcon from "@mui/icons-material/PsychologyRounded";
-import { api } from "../services/api";
+import HistoryRoundedIcon from "@mui/icons-material/HistoryRounded";
+import { api, Audit } from "../services/api";
 import SectionHeader from "../components/SectionHeader";
 import { palette } from "../theme/kiwiTheme";
 
 export default function AdminSettings() {
   const [health, setHealth] = useState(null);
-  useEffect(() => { api.get("/health").then((r) => setHealth(r.data)); }, []);
+  const [aiHistory, setAiHistory] = useState([]);
+  useEffect(() => {
+    api.get("/health").then((r) => setHealth(r.data));
+    Audit.ai_outputs({ limit: 10 }).then((d) => setAiHistory(d.items || [])).catch(() => {});
+  }, []);
 
   return (
     <Box>
@@ -92,6 +97,62 @@ export default function AdminSettings() {
                 <Row k="Audit trail" v="Per-call attribution + AI response logging" />
                 <Row k="Role-aware UI" v="Rep / Manager / Executive" />
               </Stack>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12}>
+          <Card data-testid="ai-history-card">
+            <CardContent>
+              <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+                <Avatar sx={{ bgcolor: "rgba(2,129,116,0.12)", color: palette.primary }}><HistoryRoundedIcon /></Avatar>
+                <Typography variant="h6" sx={{ fontFamily: "Sora" }}>Recent AI Outputs (Audit Trail)</Typography>
+                <Chip size="small" label={`${aiHistory.length} logged`} sx={{ bgcolor: palette.cream, color: palette.primaryDark, fontWeight: 700 }} />
+              </Stack>
+              {aiHistory.length === 0 ? (
+                <Typography variant="body2" sx={{ color: palette.textMuted }}>
+                  No AI outputs persisted yet. Generate a briefing or chat to populate the audit log.
+                </Typography>
+              ) : (
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>When</TableCell>
+                      <TableCell>Type</TableCell>
+                      <TableCell>HCP / Question</TableCell>
+                      <TableCell>Provider</TableCell>
+                      <TableCell>Latency</TableCell>
+                      <TableCell>Citations</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {aiHistory.map((r, i) => (
+                      <TableRow key={i} hover>
+                        <TableCell sx={{ fontFamily: "JetBrains Mono", fontSize: 11 }}>
+                          {r.created_at?.slice(11, 19)}
+                        </TableCell>
+                        <TableCell>
+                          <Chip size="small" label={r.type} sx={{ bgcolor: palette.surfaceAlt, fontFamily: "JetBrains Mono", fontSize: 10 }} />
+                        </TableCell>
+                        <TableCell sx={{ maxWidth: 380, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {r.hcp_id || r.question || "—"}
+                        </TableCell>
+                        <TableCell>{r.provider}</TableCell>
+                        <TableCell>{r.latency_ms} ms</TableCell>
+                        <TableCell>
+                          <Stack direction="row" spacing={0.3} flexWrap="wrap" sx={{ maxWidth: 220 }}>
+                            {(r.citations || []).slice(0, 4).map((c) => (
+                              <Chip key={c} size="small" label={c} sx={{ bgcolor: palette.surfaceAlt, fontFamily: "JetBrains Mono", fontSize: 10, height: 18 }} />
+                            ))}
+                            {r.citations?.length > 4 && (
+                              <Chip size="small" label={`+${r.citations.length - 4}`} sx={{ bgcolor: palette.surfaceAlt, fontSize: 10, height: 18 }} />
+                            )}
+                          </Stack>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         </Grid>

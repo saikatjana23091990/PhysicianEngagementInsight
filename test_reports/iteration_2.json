@@ -1,0 +1,34 @@
+{
+  "summary": "Iteration 2 backend testing complete. 53/53 pytest tests passed (100%) — 35 iteration-1 regression tests still pass plus 18 new tests covering all 6 new features: (1) Mongo persistence via /api/audit/ai_outputs and /api/audit/logs endpoints; (2) Vector RAG retrieval — /api/chat/ask returns audit_id + retrieved_sources and persists to Mongo with citations; (3) XGBoost-blended NBA opportunity scores in [0,100] with confidence in [0,1]; (4) Holt-Winters forecast — 8 weekly points with sensible non-zero forecast_rate (~21-22%) and valid CI bands (low <= rate <= high); (5) Bedrock SSE streaming — /api/chat/ask_stream returns text/event-stream with both `event: meta` and `event: delta` arriving within timeout; (6) PDF export — /api/export/exec_brief_pdf returns valid application/pdf (>3KB without narrative, >4KB with narrative, %PDF magic). Briefing and exec narrative both now return audit_id and persist to Mongo. Total wall-time 208s including 4 LLM round-trips.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_iter2.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Forecast confidence_low is clamped to 0 across all 8 horizons while the band stays wide (~70 high). For a 17% conversion baseline, a 0-70 band is too loose to be actionable — consider tightening with a smaller alpha or applying historical-variance scaling to confidence intervals.",
+    "/api/audit/ai_outputs currently exposes a flat 'payload' field containing the full LLM markdown answer; for a chat with 6 citations and ~3-5KB markdown this can balloon. Consider adding a 'payload_summary' / truncated answer field and a separate full-payload endpoint to keep the audit list response light.",
+    "PDF endpoint accepts include_narrative but does not expose any size limit or caching — a malicious caller could trigger repeated 30s LLM round-trips. Add basic rate limiting and/or in-memory caching of the latest narrative for ~5 min.",
+    "Streaming /api/chat/ask_stream lacks a heartbeat — if Bedrock stalls >30s, intermediate proxies may drop the connection silently. Emit a `: keep-alive` comment line every 10s as a safety net.",
+    "Mongo collection ai_outputs has no TTL index; auditing data will grow unboundedly. Add a TTL index on created_at (e.g., 90 days) or document the retention policy."
+  ],
+  "updated_files": [
+    "/app/backend/tests/backend_test.py"
+  ],
+  "success_rate": {"backend": "100% (53/53)", "frontend": "not tested"},
+  "test_credentials": "Not required — open demo mode, no auth on backend endpoints",
+  "seed_data_creation": "No external seed. Iteration 2 lifespan creates: ai_outputs (populated by AI calls during tests — 3 chat + 2 briefing + 2 narrative entries), audit_logs (empty), rag_chunks (295 docs built at startup). Source data unchanged: 50 HCPs, 18 reps, 200 interactions, 34 conversions, 14 source tables.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All 53 backend tests pass at https://commercial-ops-ai.preview.emergentagent.com/api. Test file at /app/backend/tests/backend_test.py is organised into iteration-1 classes (TestHealth, TestKPI, ...) and iteration-2 classes (TestHealthV2, TestAudit, TestChatRAG, TestMLScoring, TestForecast, TestPDFExport, TestBriefingV2, TestExecNarrativePersist, TestStreaming, TestTopLevelRegression). PDF endpoint with narrative and SSE streaming both reliably complete within 60s on Emergent provider. Frontend has NOT been tested in either iteration — next agent should validate React/MUI UI flows, including new PDF download button and streaming chat UX.",
+  "rca of the issue": "No bugs found in iteration 2. All 6 new features implemented as specified by the main agent and pass end-to-end validation."
+}

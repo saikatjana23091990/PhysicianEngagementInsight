@@ -6,11 +6,11 @@ import os
 import pytest
 import requests
 
-BASE_URL = "https://52fc47d2-22c3-4873-8e08-8e873065f130.preview.emergentagent.com"
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://commercial-ops-ai.preview.emergentagent.com").rstrip("/")
 API = f"{BASE_URL}/api"
 
 SHORT = 30
-LONG = 90  # for LLM calls
+LONG = 120  # for LLM calls (PDF w/ narrative can take ~40s)
 
 
 @pytest.fixture(scope="session")
@@ -257,3 +257,201 @@ class TestExec:
         assert r.status_code == 200, r.text
         d = r.json()
         assert "narrative_markdown" in d or "narrative" in d
+
+
+
+# =====================================================================
+# Iteration 2: Mongo persistence, Vector RAG, XGBoost+HW, PDF, Streaming
+# =====================================================================
+
+# ---------------- Health (iteration 2 — rag_chunks expected) ----------------
+class TestHealthV2:
+    def test_health_has_14_tables_and_mongo(self, client):
+        r = client.get(f"{API}/health", timeout=SHORT)
+        assert r.status_code == 200, r.text
+        d = r.json()
+        rc = d.get("row_counts", {})
+        assert len(rc) >= 14, f"expected >=14 source tables, got {len(rc)}"
+
+
+# ---------------- Audit / Mongo persistence ----------------
+class TestAudit:
+    def test_audit_logs_endpoint(self, client):
+        r = client.get(f"{API}/audit/logs", timeout=SHORT)
+        assert r.status_code == 200, r.text
+        d = r.json()
+        # Either {items, total} or list — accept both
+        if isinstance(d, dict):
+            assert "items" in d
+            assert isinstance(d["items"], list)
+        else:
+            assert isinstance(d, list)
+
+    def test_audit_ai_outputs_chat_filter(self, client):
+        r = client.get(f"{API}/audit/ai_outputs", params={"type": "chat"}, timeout=SHORT)
+        assert r.status_code == 200, r.text
+        d = r.json()
+        items = d.get("items") if isinstance(d, dict) else d
+        assert isinstance(items, list)
+        # Every returned record should be of type chat (if any)
+        for it in items:
+            assert it.get("type") == "chat"
+
+
+# ---------------- Vector RAG: /api/chat/ask returns audit_id + sources ----
+class TestChatRAG:
+    def test_ask_persists_audit_and_sources(self, client):
+        payload = {"question": "Top conversion territories?"}
+        r = client.post(f"{API}/chat/ask", json=payload, timeout=LONG)
+        assert r.status_code == 200, r.text
+        d = r.json()
+        assert d.get("audit_id"), f"missing audit_id in response: keys={list(d.keys())}"
+        # retrieved_sources should be present (may be named differently)
+        sources = d.get("retrieved_sources") or d.get("sources") or d.get("citations")
+        assert isinstance(sources, list), f"expected retrieved_sources array, got {type(sources)}"
+        ans = d.get("answer_markdown") or d.get("answer")
+        assert ans and len(ans) > 20
+
+    def test_audit_chat_log_persisted(self, client):
+        # Run AFTER test_ask_persists_audit_and_sources — should see at least 1
+        r = client.get(f"{API}/audit/ai_outputs", params={"type": "chat"}, timeout=SHORT)
+        assert r.status_code == 200, r.text
+        d = r.json()
+        items = d.get("items") if isinstance(d, dict) else d
+        assert len(items) >= 1, "expected at least 1 chat log persisted in Mongo"
+        first = items[0]
+        # citations field present
+        assert "citations" in first or "retrieved_sources" in first or "payload" in first
+        # created_at present (could be at top-level or inside payload)
+        assert "created_at" in first or "ts" in first or "timestamp" in first or \
+            (isinstance(first.get("payload"), dict))
+
+
+# ---------------- ML: XGBoost-blended NBA scores ----------------
+class TestMLScoring:
+    def test_ranked_blended_scores(self, client):
+        r = client.get(f"{API}/nba/ranked", params={"limit": 5}, timeout=SHORT)
+        assert r.status_code == 200, r.text
+        d = r.json()
+        arr = d if isinstance(d, list) else d.get("items") or d.get("data")
+        assert isinstance(arr, list) and len(arr) > 0
+        for item in arr[:5]:
+            score = item.get("opportunity_score") or item.get("score")
+            assert score is not None, f"missing opportunity_score in {item}"
+            assert 0 <= float(score) <= 100, f"score {score} out of [0,100]"
+            conf = item.get("score_confidence") or item.get("confidence")
+            if conf is not None:
+                assert 0 <= float(conf) <= 1, f"confidence {conf} out of [0,1]"
+
+
+# ---------------- Forecasting: Holt-Winters ----------------
+class TestForecast:
+    def test_forecast_holt_winters(self, client):
+        r = client.get(f"{API}/conversion/forecast", params={"weeks_ahead": 8}, timeout=SHORT)
+        assert r.status_code == 200, r.text
+        d = r.json()
+        arr = d if isinstance(d, list) else d.get("forecast") or d.get("data")
+        assert isinstance(arr, list) and len(arr) == 8
+        non_zero = 0
+        for pt in arr:
+            assert "forecast_rate" in pt
+            assert "confidence_low" in pt
+            assert "confidence_high" in pt
+            if float(pt["forecast_rate"]) > 0:
+                non_zero += 1
+            # CI invariant
+            assert pt["confidence_low"] <= pt["forecast_rate"] <= pt["confidence_high"] + 1e-6
+        assert non_zero >= 6, f"expected most forecast rates non-zero, got {non_zero}/8"
+
+
+# ---------------- PDF Export ----------------
+class TestPDFExport:
+    def test_pdf_no_narrative(self, client):
+        r = client.post(f"{API}/export/exec_brief_pdf",
+                        json={"include_narrative": False}, timeout=SHORT)
+        assert r.status_code == 200, r.text[:200]
+        ct = r.headers.get("content-type", "")
+        assert "application/pdf" in ct, f"expected pdf, got {ct}"
+        body = r.content
+        assert body[:4] == b"%PDF", f"PDF magic missing: {body[:8]}"
+        assert len(body) > 3 * 1024, f"PDF too small: {len(body)} bytes"
+
+    def test_pdf_with_narrative(self, client):
+        r = client.post(f"{API}/export/exec_brief_pdf",
+                        json={"include_narrative": True}, timeout=LONG)
+        assert r.status_code == 200, r.text[:200]
+        ct = r.headers.get("content-type", "")
+        assert "application/pdf" in ct
+        body = r.content
+        assert body[:4] == b"%PDF"
+        assert len(body) > 4 * 1024, f"PDF w/ narrative too small: {len(body)} bytes"
+
+
+# ---------------- Briefing: audit_id field ----------------
+class TestBriefingV2:
+    def test_briefing_returns_audit_id(self, client):
+        r = client.post(f"{API}/briefing/generate",
+                        json={"hcp_id": "HCP0001"}, timeout=LONG)
+        assert r.status_code == 200, r.text
+        d = r.json()
+        assert d.get("audit_id"), f"missing audit_id in briefing response: keys={list(d.keys())}"
+        assert d.get("brief_markdown") and len(d["brief_markdown"]) > 50
+
+
+# ---------------- Exec narrative now persists ----------------
+class TestExecNarrativePersist:
+    def test_narrative_returns_audit_id(self, client):
+        r = client.post(f"{API}/exec/narrative", json={}, timeout=LONG)
+        assert r.status_code == 200, r.text
+        d = r.json()
+        assert d.get("audit_id"), f"missing audit_id in narrative response: keys={list(d.keys())}"
+
+    def test_narrative_persisted_in_audit(self, client):
+        r = client.get(f"{API}/audit/ai_outputs", params={"type": "narrative"}, timeout=SHORT)
+        assert r.status_code == 200, r.text
+        d = r.json()
+        items = d.get("items") if isinstance(d, dict) else d
+        assert isinstance(items, list)
+        assert len(items) >= 1, "expected at least 1 narrative audit entry"
+
+
+# ---------------- Streaming SSE ----------------
+class TestStreaming:
+    def test_chat_ask_stream(self, client):
+        import requests as rq
+        url = f"{API}/chat/ask_stream"
+        with rq.post(url,
+                     json={"question": "Which therapy has highest conversion?"},
+                     stream=True, timeout=60) as r:
+            assert r.status_code == 200, r.text[:200]
+            ct = r.headers.get("content-type", "")
+            assert "text/event-stream" in ct, f"expected SSE, got {ct}"
+            saw_meta = False
+            saw_delta = False
+            buf = ""
+            for raw in r.iter_lines(decode_unicode=True):
+                if raw is None:
+                    continue
+                buf += (raw or "") + "\n"
+                if "event: meta" in buf:
+                    saw_meta = True
+                if "event: delta" in buf:
+                    saw_delta = True
+                if saw_meta and saw_delta:
+                    break
+            assert saw_meta, f"no 'event: meta' in stream. buf head:\n{buf[:400]}"
+            assert saw_delta, f"no 'event: delta' in stream. buf head:\n{buf[:400]}"
+
+
+# ---------------- Top-level regression ----------------
+class TestTopLevelRegression:
+    @pytest.mark.parametrize("path", [
+        "/kpi/overview",
+        "/exec/dashboard",
+        "/kol/dashboard",
+        "/hcp/HCP0001",
+        "/territory/T01",
+    ])
+    def test_endpoint_200(self, client, path):
+        r = client.get(f"{API}{path}", timeout=SHORT)
+        assert r.status_code == 200, f"{path} failed: {r.text[:200]}"

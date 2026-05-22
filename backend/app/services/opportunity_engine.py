@@ -179,8 +179,8 @@ class OpportunityEngine:
         n_hist = norm(f["hcp_hist_conv_rate"])
         n_urg = f["event_urgency"]  # already 0-1
 
-        # Weighted composite
-        score = (
+        # Weighted composite (rule-based)
+        rule_score = (
             0.20 * n_growth
             + 0.15 * n_eng
             + 0.10 * n_pub
@@ -189,8 +189,18 @@ class OpportunityEngine:
             + 0.10 * n_urg
             + 0.10 * (1.0 - 0.5 * f["saturation"])
         )
-        score = score * (0.4 + 0.6 * f["consent_ok"])
-        f["opportunity_score"] = (score * 100).round(2)
+
+        # ML propensity score (XGBoost)
+        from app.ml.propensity import get_propensity_model
+        ml = get_propensity_model(f)
+        ml_score = ml.predict_proba(f)
+
+        # Blend rule (60%) + ML (40%), apply consent multiplier
+        blended = (0.6 * rule_score + 0.4 * ml_score) * (0.4 + 0.6 * f["consent_ok"])
+        f["opportunity_score"] = (blended * 100).round(2)
+        f["ml_propensity"] = (ml_score * 100).round(1)
+        f["rule_score"] = (rule_score * 100).round(1)
+        f["model_status"] = ml.status
 
         # Drivers (for explainability)
         f["drv_growth"] = (n_growth * 100).round(1)
@@ -200,9 +210,12 @@ class OpportunityEngine:
         f["drv_history"] = (n_hist * 100).round(1)
         f["drv_urgency"] = (n_urg * 100).round(1)
 
-        # Confidence proxy from data completeness
+        # Confidence proxy from data completeness + ML confidence
         signals = (f[["rx_total", "calls_90d", "pub_count_12m", "kol_influence"]] > 0).sum(axis=1)
-        f["score_confidence"] = (signals / 4.0 * 0.7 + 0.3).round(2)
+        base_conf = signals / 4.0 * 0.6 + 0.3
+        # ML adds confidence when predictions are decisive (far from 0.5)
+        ml_conf_boost = 0.1 * (1.0 - 4.0 * np.abs(ml_score - 0.5).clip(0, 0.5))
+        f["score_confidence"] = (base_conf + ml_conf_boost).clip(0, 1).round(2)
         return f.sort_values("opportunity_score", ascending=False)
 
     # ---------------- NBA -----------------------------

@@ -5,12 +5,13 @@ import json
 from typing import Optional
 
 from app.data.store import DataStore
+from app.data.mongo import log_ai_output
 from app.services.conversion_engine import ConversionEngine
 from app.services.kol_engine import KOLEngine
 from app.services.opportunity_engine import OpportunityEngine
 from app.ai.guardrails import build_system_prompt, trim_context
 from app.ai.llm import llm_service
-from app.ai.rag import RAGIndex
+from app.ai.vector_store import VectorStore
 
 
 class AskDataService:
@@ -52,8 +53,8 @@ class AskDataService:
         }
 
     async def ask(self, question: str, session_id: Optional[str] = None, history: Optional[list] = None) -> dict:
-        rag = RAGIndex.instance()
-        retrieved = rag.search(question, k=6)
+        vs = VectorStore.instance()
+        retrieved = await vs.search(question, k=6)
         dossier = self._build_dossier()
         system = build_system_prompt("analytics")
         ctx_str = trim_context(json.dumps({"dossier": dossier, "retrieved_records": retrieved}, default=str), 14000)
@@ -73,7 +74,7 @@ DATA:
 {ctx_str}
 """})
         resp = await llm_service.chat(messages=msgs, system=system, max_tokens=1100)
-        return {
+        out = {
             "question": question,
             "answer_markdown": resp.text,
             "provider": resp.provider,
@@ -83,3 +84,38 @@ DATA:
             "retrieved_sources": retrieved,
             "session_id": session_id,
         }
+        try:
+            audit_id = await log_ai_output(
+                "chat", out, question=question,
+                provider=resp.provider, model=resp.model,
+                latency_ms=resp.latency_ms, fallback_used=resp.fallback_used,
+                citations=[s["source_id"] for s in retrieved],
+            )
+            out["audit_id"] = audit_id
+        except Exception:
+            out["audit_id"] = None
+        return out
+
+    async def build_stream_payload(self, question: str, history: Optional[list] = None) -> dict:
+        """Returns the (system, messages, retrieved) tuple as dict for streaming endpoint."""
+        vs = VectorStore.instance()
+        retrieved = await vs.search(question, k=6)
+        dossier = self._build_dossier()
+        system = build_system_prompt("analytics")
+        ctx_str = trim_context(json.dumps({"dossier": dossier, "retrieved_records": retrieved}, default=str), 14000)
+        msgs = []
+        if history:
+            for h in history[-6:]:
+                msgs.append({"role": h.get("role", "user"), "content": h.get("content", "")})
+        msgs.append({"role": "user", "content": f"""Question: {question}
+
+Use ONLY the supplied dossier/retrieved records. Answer with:
+1. **Direct Answer** (2-4 sentences)
+2. **Supporting Data** (bullet points with concrete numbers)
+3. **Cited Sources** (list source IDs you used)
+4. **Caveats** (any limitations or data gaps)
+
+DATA:
+{ctx_str}
+"""})
+        return {"system": system, "messages": msgs, "retrieved": retrieved}

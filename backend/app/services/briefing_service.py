@@ -7,11 +7,12 @@ from typing import Optional
 import pandas as pd
 
 from app.data.store import DataStore
+from app.data.mongo import log_ai_output
 from app.services.conversion_engine import ConversionEngine
 from app.services.opportunity_engine import OpportunityEngine
 from app.ai.guardrails import build_system_prompt, trim_context
 from app.ai.llm import llm_service
-from app.ai.rag import RAGIndex
+from app.ai.vector_store import VectorStore
 
 
 class BriefingService:
@@ -76,10 +77,10 @@ class BriefingService:
         if not ctx:
             return {"error": f"Unknown hcp_id {hcp_id}"}
 
-        # Augment with RAG over notes specifically for this HCP
-        rag = RAGIndex.instance()
+        # Augment with RAG over notes specifically for this HCP (Mongo-backed vector store)
+        vs = VectorStore.instance()
         retrieval_query = f"HCP {ctx['hcp']['hcp_name']} {ctx['hcp']['specialty_group']} engagement objections opportunities"
-        retrieved = rag.search(retrieval_query, k=8, filters={"hcp_id": hcp_id})
+        retrieved = await vs.search(retrieval_query, k=8, filters={"hcp_id": hcp_id})
 
         system = build_system_prompt("rep_briefing")
         ctx_str = trim_context(json.dumps({"hcp_context": ctx, "retrieved_records": retrieved}, default=str), 12000)
@@ -139,3 +140,20 @@ CONTEXT (JSON):
                 "system_prompt_version": "v1.0-guardrailed",
             },
         }
+
+    async def generate_brief_with_audit(self, hcp_id: str) -> dict:
+        out = await self.generate_brief(hcp_id)
+        if "error" in out:
+            return out
+        try:
+            audit_id = await log_ai_output(
+                "briefing", out,
+                hcp_id=hcp_id, provider=out.get("provider"), model=out.get("model"),
+                latency_ms=out.get("latency_ms"), fallback_used=out.get("fallback_used"),
+                citations=[s["source_id"] for s in out.get("retrieved_sources", [])],
+            )
+            out["audit_id"] = audit_id
+        except Exception as e:
+            out["audit_id"] = None
+            out["audit_error"] = str(e)
+        return out

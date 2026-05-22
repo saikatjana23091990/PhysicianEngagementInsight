@@ -16,9 +16,11 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(na
 logger = logging.getLogger("app")
 
 from app.data.store import DataStore
+from app.data.mongo import ensure_indexes
+from app.ai.vector_store import VectorStore
 from app.api import (
     health, kpi, hcp, rep, territory, conversion, kol,
-    briefing, nba, sources, chat, exec_dashboard
+    briefing, nba, sources, chat, exec_dashboard, audit, export,
 )
 
 
@@ -27,6 +29,15 @@ async def lifespan(app: FastAPI):
     logger.info("Bootstrapping DataStore...")
     DataStore.instance().load_all()
     logger.info("DataStore ready. Rows: %s", DataStore.instance().counts())
+    try:
+        await ensure_indexes()
+    except Exception as e:
+        logger.warning("Mongo index init failed (non-fatal): %s", e)
+    try:
+        n = await VectorStore.instance().build()
+        logger.info("VectorStore built (%s chunks)", n)
+    except Exception as e:
+        logger.warning("VectorStore build failed (non-fatal): %s", e)
     yield
     logger.info("Shutting down.")
 
@@ -47,8 +58,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register routers (all under /api)
-for module in (health, kpi, hcp, rep, territory, conversion, kol, briefing, nba, sources, chat, exec_dashboard):
+for module in (health, kpi, hcp, rep, territory, conversion, kol, briefing, nba,
+               sources, chat, exec_dashboard, audit, export):
     app.include_router(module.router, prefix="/api")
 
 

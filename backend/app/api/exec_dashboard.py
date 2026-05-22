@@ -76,10 +76,20 @@ Structure:
 DATA:
 {json.dumps(payload, default=str)}"""
     resp = await llm_service.chat(messages=[{"role": "user", "content": prompt}], system=system, max_tokens=900)
-    return {
+    out = {
         "narrative_markdown": resp.text,
         "provider": resp.provider,
         "model": resp.model,
         "latency_ms": resp.latency_ms,
         "fallback_used": resp.fallback_used,
     }
+    try:
+        from app.data.mongo import log_ai_output
+        audit_id = await log_ai_output(
+            "narrative", out, provider=resp.provider, model=resp.model,
+            latency_ms=resp.latency_ms, fallback_used=resp.fallback_used,
+        )
+        out["audit_id"] = audit_id
+    except Exception:
+        out["audit_id"] = None
+    return out

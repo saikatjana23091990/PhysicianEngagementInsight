@@ -68,6 +68,67 @@ export const Chat = {
   ask: (question, history, session_id) =>
     api.post("/chat/ask", { question, history, session_id }).then((r) => r.data),
   suggested: () => api.get("/chat/suggested").then((r) => r.data),
+  // Streaming via fetch (SSE-style parsing)
+  askStream: async (question, history, onMeta, onDelta, onDone, onError) => {
+    const url = `${API_URL}/chat/ask_stream`;
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, history }),
+      });
+      if (!res.body) throw new Error("No stream body");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const events = buf.split("\n\n");
+        buf = events.pop() || "";
+        for (const ev of events) {
+          const lines = ev.split("\n");
+          let evt = "message";
+          let data = "";
+          for (const l of lines) {
+            if (l.startsWith("event:")) evt = l.slice(6).trim();
+            else if (l.startsWith("data:")) data = l.slice(5).trim();
+          }
+          if (!data) continue;
+          try {
+            const parsed = JSON.parse(data);
+            if (evt === "meta") onMeta?.(parsed);
+            else if (evt === "delta") onDelta?.(parsed.text);
+            else if (evt === "done") onDone?.(parsed);
+            else if (evt === "error") onError?.(parsed);
+          } catch {/* ignore parse errors */}
+        }
+      }
+    } catch (e) {
+      onError?.({ message: e.message });
+    }
+  },
+};
+
+export const Audit = {
+  ai_outputs: (params) => api.get("/audit/ai_outputs", { params }).then((r) => r.data),
+  logs: (params) => api.get("/audit/logs", { params }).then((r) => r.data),
+};
+
+export const Export = {
+  execBriefPdf: async (include_narrative = true) => {
+    const res = await api.post("/export/exec_brief_pdf", { include_narrative }, { responseType: "blob" });
+    const blob = new Blob([res.data], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `kiwi-exec-brief-${new Date().toISOString().slice(0, 10)}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
 };
 
 export const ExecDash = {

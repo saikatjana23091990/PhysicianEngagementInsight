@@ -73,6 +73,44 @@ class BedrockProvider:
         text = "".join(p.get("text", "") for p in parts if p.get("type") == "text")
         return text.strip()
 
+    async def stream(self, messages: list[dict], system: str = "", max_tokens: int = 800):
+        """Native Bedrock streaming via InvokeModelWithResponseStream."""
+        if not self.configured():
+            raise RuntimeError("Bedrock bearer token not configured")
+        payload = {
+            "anthropic_version": "bedrock-2023-05-31",
+            "max_tokens": max_tokens,
+            "messages": messages,
+        }
+        if system:
+            payload["system"] = system
+        url = f"{self.endpoint}/model/{self.model}/invoke-with-response-stream"
+        headers = {
+            "Authorization": f"Bearer {self.bearer}",
+            "Content-Type": "application/json",
+            "Accept": "application/vnd.amazon.eventstream",
+        }
+        async with httpx.AsyncClient(timeout=60.0) as cli:
+            async with cli.stream("POST", url, headers=headers, content=json.dumps(payload)) as r:
+                async for chunk in r.aiter_bytes():
+                    # Bedrock event-stream framing — extract any JSON delta heuristically
+                    try:
+                        text = chunk.decode("utf-8", errors="ignore")
+                        # Bedrock wraps payloads with binary framing; pull out {"bytes":"<base64>"} chunks
+                        import re, base64
+                        for m in re.finditer(r'\{"bytes":"([^"]+)"\}', text):
+                            try:
+                                decoded = base64.b64decode(m.group(1)).decode("utf-8", errors="ignore")
+                                obj = json.loads(decoded)
+                                if obj.get("type") == "content_block_delta":
+                                    delta = obj.get("delta", {}).get("text", "")
+                                    if delta:
+                                        yield delta
+                            except Exception:
+                                continue
+                    except Exception:
+                        continue
+
 
 class EmergentProvider:
     name = "emergent"
@@ -135,6 +173,36 @@ class LLMService:
                 last_err = e
                 continue
         raise RuntimeError(f"No LLM provider available: {last_err}")
+
+    async def stream(self, messages: list[dict], system: str = "", max_tokens: int = 800):
+        """Async generator yielding text deltas. Falls back to chunked emission for Emergent."""
+        # Try Bedrock native stream if configured
+        if self.preferred == "bedrock" and self.bedrock.configured():
+            try:
+                async for delta in self.bedrock.stream(messages, system=system, max_tokens=max_tokens):
+                    yield {"type": "delta", "text": delta, "provider": "bedrock"}
+                return
+            except Exception as e:
+                logger.warning("Bedrock streaming failed, falling back: %s", e)
+
+        # Fallback: generate fully then emit in word chunks
+        import asyncio
+        for prov_name, prov in (("emergent", self.emergent), ("bedrock", self.bedrock)):
+            if not prov.configured():
+                continue
+            try:
+                text = await prov.chat(messages, system=system, max_tokens=max_tokens)
+                # Emit word-by-word for streaming UX
+                words = text.split(" ")
+                for i, w in enumerate(words):
+                    yield {"type": "delta", "text": w + (" " if i < len(words) - 1 else ""), "provider": prov_name}
+                    if i % 4 == 0:
+                        await asyncio.sleep(0.015)
+                return
+            except Exception as e:
+                logger.warning("Provider %s failed during stream-fallback: %s", prov_name, e)
+                continue
+        yield {"type": "error", "text": "No LLM provider available"}
 
 
 llm_service = LLMService()

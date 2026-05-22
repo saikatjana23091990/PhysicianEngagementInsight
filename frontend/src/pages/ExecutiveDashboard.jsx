@@ -4,11 +4,12 @@ import {
   Table, TableHead, TableRow, TableCell, TableBody, LinearProgress,
 } from "@mui/material";
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
+import PictureAsPdfRoundedIcon from "@mui/icons-material/PictureAsPdfRounded";
 import ReactMarkdown from "react-markdown";
 import {
   AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, BarChart, Bar, CartesianGrid, Legend, Cell,
 } from "recharts";
-import { ExecDash } from "../services/api";
+import { ExecDash, Export } from "../services/api";
 import { chartPalette, palette } from "../theme/kiwiTheme";
 import KPICard from "../components/KPICard";
 import SectionHeader from "../components/SectionHeader";
@@ -18,6 +19,7 @@ export default function ExecutiveDashboard() {
   const [data, setData] = useState(null);
   const [narrative, setNarrative] = useState(null);
   const [narrLoading, setNarrLoading] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   useEffect(() => {
     ExecDash.dashboard().then(setData).catch(console.error);
@@ -35,6 +37,17 @@ export default function ExecutiveDashboard() {
     }
   };
 
+  const downloadPdf = async () => {
+    setPdfLoading(true);
+    try {
+      await Export.execBriefPdf(true);
+    } catch (e) {
+      alert("PDF export failed: " + e.message);
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
   if (!data) return <LoadingState label="Loading executive view…" />;
 
   const conv = data.conversion;
@@ -45,15 +58,30 @@ export default function ExecutiveDashboard() {
         title="Executive Dashboard"
         subtitle="Engagement-to-Conversion across the field force, with AI-generated narrative and KOL signals."
         actions={
-          <Button
-            data-testid="exec-narrative-btn"
-            variant="contained"
-            startIcon={<AutoAwesomeRoundedIcon />}
-            onClick={generateNarrative}
-            disabled={narrLoading}
-          >
-            {narrLoading ? "Generating…" : "Generate AI Narrative"}
-          </Button>
+          <Stack direction="row" spacing={1}>
+            <Button
+              data-testid="exec-pdf-btn"
+              variant="outlined"
+              startIcon={<PictureAsPdfRoundedIcon />}
+              onClick={downloadPdf}
+              disabled={pdfLoading}
+              sx={{
+                borderColor: palette.primary, color: palette.primary,
+                "&:hover": { borderColor: palette.primaryDark, bgcolor: "rgba(2,129,116,0.06)" },
+              }}
+            >
+              {pdfLoading ? "Generating PDF…" : "Export Brief (PDF)"}
+            </Button>
+            <Button
+              data-testid="exec-narrative-btn"
+              variant="contained"
+              startIcon={<AutoAwesomeRoundedIcon />}
+              onClick={generateNarrative}
+              disabled={narrLoading}
+            >
+              {narrLoading ? "Generating…" : "Generate AI Narrative"}
+            </Button>
+          </Stack>
         }
       />
 

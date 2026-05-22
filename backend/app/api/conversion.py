@@ -92,31 +92,22 @@ def audit(interaction_id: str):
 
 @router.get("/forecast")
 def forecast(weeks_ahead: int = 8):
-    """Lightweight EWM forecast on weekly conversion rate (Prophet not added to keep deps lean)."""
-    import numpy as np
+    """Holt-Winters forecast on weekly conversion rate with EWM fallback."""
+    import pandas as pd
+    from app.ml.forecast import forecast_holt_winters
     eng = ConversionEngine()
     df = eng.trend(freq="W")
     if df.empty:
         return []
-    series = df["conversion_rate"].values
+    series = pd.Series(df["conversion_rate"].values, index=df["bucket"])
+    fc = forecast_holt_winters(series, steps=weeks_ahead)
     last = df["bucket"].iloc[-1]
-    # exponential smoothing forecast
-    alpha = 0.4
-    level = series[0]
-    for v in series[1:]:
-        level = alpha * v + (1 - alpha) * level
-    # add trend approx using last 4 weeks
-    if len(series) >= 4:
-        trend_val = float(np.mean(np.diff(series[-4:])))
-    else:
-        trend_val = 0.0
     out = []
-    for i in range(1, weeks_ahead + 1):
-        forecast_val = round(max(0.0, level + trend_val * i), 2)
+    for i, (_, row) in enumerate(fc.iterrows(), start=1):
         out.append({
-            "bucket": (last + __import__("pandas").Timedelta(weeks=i)).isoformat(),
-            "forecast_rate": forecast_val,
-            "confidence_low": round(max(0.0, forecast_val - 2.5), 2),
-            "confidence_high": round(forecast_val + 2.5, 2),
+            "bucket": (last + pd.Timedelta(weeks=i)).isoformat(),
+            "forecast_rate": float(row["forecast"]),
+            "confidence_low": float(row["low"]),
+            "confidence_high": float(row["high"]),
         })
     return out
