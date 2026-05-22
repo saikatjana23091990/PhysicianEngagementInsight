@@ -1,0 +1,11 @@
+product_id,brand_name,primary_indication,dosage_form,molecule_class,life_cycle_stage,launch_year,channel_focus,status
+PRD001,Darzalex,Oncology,IV/SC,Biologic,L1/L2,2019,Digital,Mature
+PRD002,Tremfya,Immunology,SC,Biologic,L1/L2,2017,Digital,Mature
+PRD003,Stelara,Immunology,SC,Biologic,L1/L2,2021,Medical,Launched
+PRD004,Tecvayli,Oncology,SC,Biologic,L2,2025,Field,Launched
+PRD005,Carvykti,Oncology,IV,Cell Therapy,L3,2021,Field,Growth
+PRD006,Rybrevant,Oncology,IV,Biologic,L2,2017,Medical,Growth
+PRD007,Spravato,Neuroscience,Nasal,Small Molecule,L2,2023,Market Access,Growth
+PRD008,Invega Sustenna,Psychiatry,IM,Small Molecule,L1,2019,Field,Growth
+PRD009,Erleada,Oncology,Oral,Small Molecule,L1,2019,Field,Growth
+PRD010,Remicade,Immunology,IV,Biologic,L2,2021,Field,Growth

@@ -1,0 +1,13 @@
+account_id,account_name,account_type,region,territory,patient_volume_band,payer_mix,hospitals_in_network,adult_patient_volume_est,account_status
+ACC001,"Rodriguez, Figueroa and Sanchez",Academic Medical Center,Northeast,T02,High,Commercial-heavy,3,2479,Watchlist
+ACC002,Doyle Ltd,Academic Medical Center,West,T01,Very High,Commercial-heavy,2,4382,Active
+ACC003,"Mcclain, Miller and Henderson",Academic Medical Center,West,T06,Medium,Government-heavy,7,4411,Growth
+ACC004,Davis and Sons,Private Group,West,T06,Low,Commercial-heavy,7,6374,Growth
+ACC005,"Guzman, Hoffman and Baldwin",Community Hospital,Southeast,T01,High,Commercial-heavy,7,2384,Growth
+ACC006,"Gardner, Robinson and Lawrence",Private Group,Midwest,T04,Low,Government-heavy,2,7001,Active
+ACC007,Blake and Sons,Private Group,West,T02,High,Government-heavy,2,1550,Watchlist
+ACC008,"Henderson, Ramirez and Lewis",Private Group,Southeast,T01,Low,Commercial-heavy,7,5354,Growth
+ACC009,Garcia-James,Community Hospital,Midwest,T02,High,Balanced,5,11999,Watchlist
+ACC010,Abbott-Munoz,Community Hospital,Northeast,T04,Medium,Commercial-heavy,7,5222,Watchlist
+ACC011,Blair PLC,Community Hospital,West,T02,High,Commercial-heavy,1,5968,Growth
+ACC012,Dudley Group,Academic Medical Center,Midwest,T06,Medium,Government-heavy,6,4283,Watchlist

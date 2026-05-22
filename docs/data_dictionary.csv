@@ -1,0 +1,171 @@
+table_name,column_name,data_type,required,pii_or_phi,definition,example_value,source_system
+account_master,account_id,string,Y,N,Unique source identifier for the account,ACC001,Synthetic
+account_master,account_name,string,Y,N,"Hospital, clinic, or group name",St. Mary Medical Center,Synthetic
+account_master,account_type,string,Y,N,Type of institution,Academic Medical Center,Synthetic
+account_master,region,string,Y,N,Commercial region,Northeast,Synthetic
+account_master,territory,string,Y,N,Sales territory code,T03,Synthetic
+account_master,patient_volume_band,string,Y,N,Relative patient volume classification,Very High,Synthetic
+account_master,payer_mix,string,Y,N,Dominant payer composition,Balanced,Synthetic
+account_master,hospitals_in_network,integer,Y,N,Count of facilities in network,4,Synthetic
+account_master,adult_patient_volume_est,integer,Y,N,Estimated adult patient volume,8400,Synthetic
+account_master,account_status,string,Y,N,Account lifecycle status,Growth,Synthetic
+hcp_master,hcp_id,string,Y,N,Unique source identifier for HCP,HCP0001,Synthetic
+hcp_master,hcp_name,string,Y,Y,Full HCP name in source master,Dr. Maya Patel,Synthetic
+hcp_master,specialty_group,string,Y,N,Broad specialty classification,Oncology,Synthetic
+hcp_master,sub_specialty,string,Y,N,Detailed specialty classification,Hematology Oncology,Synthetic
+hcp_master,affiliated_account_id,string,Y,N,Primary account linkage,ACC004,Synthetic
+hcp_master,affiliated_hospital,string,Y,N,Primary affiliated institution,City General Hospital,Synthetic
+hcp_master,region,string,Y,N,Commercial region,West,Synthetic
+hcp_master,territory,string,Y,N,Sales territory code,T02,Synthetic
+hcp_master,channel_preference,string,Y,N,Preferred field/remote channel,Virtual,Synthetic
+hcp_master,consent_status,string,Y,N,Consent state for digital/commercial contact,Opted-in,Synthetic
+hcp_master,preferred_language,string,Y,N,Preferred language,English,Synthetic
+hcp_master,digital_engagement_tier,string,Y,N,Relative digital engagement score band,High,Synthetic
+hcp_master,speaker_potential_flag,integer,Y,N,Flag indicating possible speaker potential,1,Synthetic
+hcp_master,publication_activity_level,string,Y,N,Publication activity band,Medium,Synthetic
+hcp_master,first_seen_date,date,Y,N,Date HCP first appeared in source system,2023-04-12,Synthetic
+hcp_master,last_updated_date,date,Y,N,Most recent refresh date,2026-03-21,Synthetic
+product_master,product_id,string,Y,N,Unique product identifier,PRD001,Synthetic
+product_master,brand_name,string,Y,N,Brand name,Darzalex,Synthetic
+product_master,primary_indication,string,Y,N,Core disease area,Oncology,Synthetic
+product_master,dosage_form,string,Y,N,Formulation route or form,IV/SC,Synthetic
+product_master,molecule_class,string,Y,N,Drug class,Biologic,Synthetic
+product_master,life_cycle_stage,string,Y,N,Commercial maturity stage,L1/L2,Synthetic
+product_master,launch_year,integer,Y,N,Initial launch year,2016,Synthetic
+product_master,channel_focus,string,Y,N,Primary go-to-market focus,Field,Synthetic
+product_master,status,string,Y,N,Commercial status,Launched,Synthetic
+publication_source,publication_id,string,Y,N,Unique publication source identifier,PUB0001,Synthetic
+publication_source,hcp_id,string,Y,N,Linked HCP author or investigator,HCP0042,Synthetic
+publication_source,publication_date,date,Y,N,Publication date,2025-08-14,Synthetic
+publication_source,publication_title,string,Y,N,Title of article or abstract,Clinical outcomes in ...,Synthetic
+publication_source,journal_name,string,Y,N,Journal or conference source,NEJM,Synthetic
+publication_source,topic_tag,string,Y,N,Normalized topic tag,Efficacy,Synthetic
+publication_source,article_type,string,Y,N,Type of publication,Original Research,Synthetic
+publication_source,topic_sentiment,string,Y,N,Qualitative tone,Positive,Synthetic
+publication_source,key_finding_summary,string,Y,N,Short source summary,Improved outcomes observed,Synthetic
+publication_source,relevance_score,decimal,Y,N,Manual or model relevance scoring,0.86,Synthetic
+publication_source,source_type,string,Y,N,Source channel,PubMed,Synthetic
+field_interactions_source,interaction_id,string,Y,N,Unique field interaction identifier,INT00001,Synthetic
+field_interactions_source,hcp_id,string,Y,N,Linked HCP identifier,HCP0012,Synthetic
+field_interactions_source,rep_id,string,Y,N,Field representative identifier,REP004,Synthetic
+field_interactions_source,interaction_datetime,datetime,Y,N,Datetime of the interaction,2026-02-17T10:15:00,Synthetic
+field_interactions_source,channel,string,Y,N,Communication channel,In-person,Synthetic
+field_interactions_source,account_id,string,Y,N,Linked account identifier,ACC003,Synthetic
+field_interactions_source,product_id,string,Y,N,Discussed product identifier,PRD002,Synthetic
+field_interactions_source,discussion_topic,string,Y,N,Main discussion topic,Dosing,Synthetic
+field_interactions_source,duration_minutes,integer,Y,N,Conversation duration in minutes,12,Synthetic
+field_interactions_source,objective_type,string,Y,N,Field objective type,Detail,Synthetic
+field_interactions_source,objection_raised_flag,integer,Y,N,Whether objection was raised,1,Synthetic
+field_interactions_source,follow_up_required_flag,integer,Y,N,Whether follow-up is required,0,Synthetic
+field_interactions_source,call_outcome,string,Y,N,Conversation outcome,Positive,Synthetic
+field_interactions_source,crm_note_raw,string,Y,Y,Unstructured CRM note text,Discussed efficacy data.,Synthetic
+field_interactions_source,next_step_raw,string,Y,N,Raw next-step note,Share payer update,Synthetic
+prescription_claims_source,claim_id,string,Y,N,Unique claim/source row identifier,CLM000001,Synthetic
+prescription_claims_source,hcp_id,string,Y,N,Linked HCP identifier,HCP0024,Synthetic
+prescription_claims_source,product_id,string,Y,N,Product identifier,PRD001,Synthetic
+prescription_claims_source,service_month,date,Y,N,Monthly service period,2025-03-01,Synthetic
+prescription_claims_source,n_rx,integer,Y,N,Total prescriptions in month,28,Synthetic
+prescription_claims_source,new_rx,integer,Y,N,New prescriptions in month,7,Synthetic
+prescription_claims_source,total_patients,integer,Y,N,Estimated patients on therapy,39,Synthetic
+prescription_claims_source,payer_type,string,Y,N,Primary payer mix,Commercial,Synthetic
+prescription_claims_source,channel_source,string,Y,N,Input source type,Claims,Synthetic
+prescription_claims_source,geo_region,string,Y,N,Geographic region,Midwest,Synthetic
+event_source,event_id,string,Y,N,Unique event identifier,EVT0001,Synthetic
+event_source,hcp_id,string,Y,N,Linked HCP identifier,HCP0034,Synthetic
+event_source,event_date,date,Y,N,Date of event,2025-11-08,Synthetic
+event_source,event_type,string,Y,N,Event category,Congress,Synthetic
+event_source,source,string,Y,N,Where event came from,Conference list,Synthetic
+event_source,topic,string,Y,N,Normalized event topic,Guidelines,Synthetic
+event_source,engagement_score,decimal,Y,N,Engagement intensity score,0.72,Synthetic
+event_source,note_raw,string,Y,N,Raw event note,Spoke at the plenary session,Synthetic
+digital_engagement_source,engagement_id,string,Y,N,Unique digital engagement row identifier,DIG00001,Synthetic
+digital_engagement_source,hcp_id,string,Y,N,Linked HCP identifier,HCP0041,Synthetic
+digital_engagement_source,account_id,string,Y,N,Linked account identifier,ACC007,Synthetic
+digital_engagement_source,campaign_id,string,Y,N,Campaign identifier,CMP003,Synthetic
+digital_engagement_source,engagement_date,date,Y,N,Date of engagement,2026-01-12,Synthetic
+digital_engagement_source,touchpoint,string,Y,N,Digital touchpoint,Email,Synthetic
+digital_engagement_source,engagement_event,string,Y,N,Interaction event type,Open,Synthetic
+digital_engagement_source,engagement_value,integer,Y,N,Numeric engagement score or weight,77,Synthetic
+digital_engagement_source,device_type,string,Y,N,Device used,Mobile,Synthetic
+digital_engagement_source,source_system,string,Y,N,Source platform,GA4,Synthetic
+market_events_source,market_event_id,string,Y,N,Unique market event identifier,MKT0001,Synthetic
+market_events_source,event_date,date,Y,N,Date of market event,2025-10-02,Synthetic
+market_events_source,product_id,string,Y,N,Linked product identifier,PRD003,Synthetic
+market_events_source,event_type,string,Y,N,Market/access event type,Biosimilar entry,Synthetic
+market_events_source,region,string,Y,N,Affected region,South,Synthetic
+market_events_source,event_severity,string,Y,N,Estimated severity,High,Synthetic
+market_events_source,summary_raw,string,Y,N,Raw event note,Competitor launched in region,Synthetic
+market_events_source,source_name,string,Y,N,Source channel,FDA,Synthetic
+rep_master,rep_id,string,Y,N,Unique sales rep identifier,REP001,Synthetic
+rep_master,rep_name,string,Y,N,Sales rep display name,Ava Reynolds,Synthetic
+rep_master,region,string,Y,N,Primary commercial region,West,Synthetic
+rep_master,territory,string,Y,N,Assigned sales territory,T06,Synthetic
+rep_master,home_city,string,N,N,Home/base city of the rep,Chicago,Synthetic
+rep_master,primary_therapy_area,string,Y,N,Primary therapy area focus,Oncology,Synthetic
+rep_master,seniority_level,string,Y,N,Field experience band,Senior,Synthetic
+rep_master,hire_date,date,Y,N,Rep hire date,2020-04-15,Synthetic
+rep_master,manager_id,string,Y,N,Manager identifier,MGR001,Synthetic
+rep_master,manager_name,string,Y,N,Manager display name,North East Lead,Synthetic
+rep_master,quota_band,string,Y,N,Quota band classification,High,Synthetic
+rep_master,active_flag,integer,Y,N,Active rep indicator,1,Synthetic
+rep_master,digital_adoption_tier,string,Y,N,Digital channel adoption band,Medium,Synthetic
+rep_master,field_coaching_flag,integer,Y,N,Field coaching attention flag,0,Synthetic
+rep_master,travel_intensity_band,string,Y,N,Travel load band,Medium,Synthetic
+rep_master,home_office_state,string,N,N,Home office state code,CA,Synthetic
+rep_master,current_status,string,Y,N,Employment or activity status,Active,Synthetic
+rep_master,source_system,string,Y,N,Source system name,Synthetic Rep Master,Synthetic
+rep_quota_source,quota_id,string,Y,N,Unique quota row identifier,QTA00001,Synthetic
+rep_quota_source,rep_id,string,Y,N,Rep identifier,REP001,Synthetic
+rep_quota_source,territory,string,Y,N,Assigned territory,T06,Synthetic
+rep_quota_source,region,string,Y,N,Commercial region,West,Synthetic
+rep_quota_source,report_month,date,Y,N,Quota month,2025-01-01,Synthetic
+rep_quota_source,therapy_area,string,Y,N,Primary therapy area,Oncology,Synthetic
+rep_quota_source,call_quota,integer,Y,N,Monthly planned call quota,55,Synthetic
+rep_quota_source,sample_quota,integer,Y,N,Monthly sample quota,8,Synthetic
+rep_quota_source,target_hcp_visits,integer,Y,N,Monthly HCP visit target,41,Synthetic
+rep_quota_source,target_conversion_rate,float,Y,N,Target conversion rate used by leadership,0.11,Synthetic
+rep_quota_source,manager_review_flag,integer,Y,N,Indicates a manager-reviewed quota month,0,Synthetic
+rep_quota_source,source_system,string,Y,N,Source system name,Synthetic Sales Ops,Synthetic
+kol_master,kol_id,string,Y,N,Unique KOL identifier,KOL0001,Synthetic
+kol_master,hcp_id,string,Y,N,Linked HCP master identifier,HCP0038,Synthetic
+kol_master,hcp_name,string,Y,N,KOL display name,Dr. A. Example,Synthetic
+kol_master,specialty_group,string,Y,N,Main specialty group,Oncology,Synthetic
+kol_master,sub_specialty,string,Y,N,Sub-specialty,Medical Oncology,Synthetic
+kol_master,affiliated_account_id,string,Y,N,Linked account identifier,ACC006,Synthetic
+kol_master,affiliated_hospital,string,Y,N,Hospital or institution name,St. Mary Medical Center,Synthetic
+kol_master,region,string,Y,N,Commercial region,Northeast,Synthetic
+kol_master,territory,string,Y,N,Commercial territory,T02,Synthetic
+kol_master,kol_tier,string,Y,N,KOL tier classification,Tier 1,Synthetic
+kol_master,influence_score,float,Y,N,Composite KOL influence score,0.84,Synthetic
+kol_master,citation_count_5y,integer,Y,N,Estimated citations in last five years,124,Synthetic
+kol_master,speaker_event_count_12m,integer,Y,N,Speaking events in last 12 months,7,Synthetic
+kol_master,network_centrality_score,float,Y,N,Graph centrality score in KOL network,0.71,Synthetic
+kol_master,topic_focus_primary,string,Y,N,Primary topic focus,Efficacy,Synthetic
+kol_master,topic_focus_secondary,string,N,N,Secondary topic focus,Treatment sequencing,Synthetic
+kol_master,institution_prestige_band,string,Y,N,Prestige band of affiliated institution,High,Synthetic
+kol_master,rising_star_flag,integer,Y,N,Indicates rising KOL status,1,Synthetic
+kol_master,last_kol_review_date,date,Y,N,Last review date for KOL status,2026-02-01,Synthetic
+kol_master,source_system,string,Y,N,Source system name,Synthetic KOL Master,Synthetic
+kol_relationship_source,relationship_id,string,Y,N,Unique relationship row identifier,KREL00001,Synthetic
+kol_relationship_source,kol_id_1,string,Y,N,First KOL identifier,KOL0001,Synthetic
+kol_relationship_source,kol_id_2,string,Y,N,Second KOL identifier,KOL0002,Synthetic
+kol_relationship_source,hcp_id_1,string,Y,N,First linked HCP identifier,HCP0038,Synthetic
+kol_relationship_source,hcp_id_2,string,Y,N,Second linked HCP identifier,HCP0011,Synthetic
+kol_relationship_source,relationship_type,string,Y,N,Type of KOL relationship,coauthored,Synthetic
+kol_relationship_source,shared_topic,string,Y,N,Shared topical linkage,Efficacy,Synthetic
+kol_relationship_source,edge_weight,float,Y,N,Relationship strength weight,0.68,Synthetic
+kol_relationship_source,evidence_source,string,Y,N,Evidence supporting relationship,PubMed,Synthetic
+kol_relationship_source,since_date,date,Y,N,Relationship first observed date,2024-03-12,Synthetic
+kol_relationship_source,source_system,string,Y,N,Source system name,Synthetic KOL Network,Synthetic
+conversion_events_source,conversion_event_id,string,Y,N,Unique conversion event identifier,CONV00001,Synthetic
+conversion_events_source,hcp_id,string,Y,N,Linked HCP identifier,HCP0014,Synthetic
+conversion_events_source,rep_id,string,Y,N,Linked rep identifier,REP004,Synthetic
+conversion_events_source,account_id,string,Y,N,Linked account identifier,ACC012,Synthetic
+conversion_events_source,product_id,string,Y,N,Related product identifier,PRD009,Synthetic
+conversion_events_source,linked_call_id,string,N,N,Originating call identifier,INT00002,Synthetic
+conversion_events_source,conversion_type,string,Y,N,Qualified conversion type,Sample request,Synthetic
+conversion_events_source,conversion_timestamp,timestamp,Y,N,Conversion event timestamp,2025-10-12T09:00:00,Synthetic
+conversion_events_source,days_from_call,integer,N,N,Days from linked call to conversion,14,Synthetic
+conversion_events_source,conversion_value,integer,N,N,Relative conversion value,3,Synthetic
+conversion_events_source,attribution_confidence,float,Y,N,Confidence score for attribution,0.86,Synthetic
+conversion_events_source,source_system,string,Y,N,Source system name,Sales Ops,Synthetic

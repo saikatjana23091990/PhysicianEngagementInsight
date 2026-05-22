@@ -1,0 +1,19 @@
+rep_id,rep_name,region,territory,home_city,primary_therapy_area,seniority_level,hire_date,manager_id,manager_name,quota_band,active_flag,digital_adoption_tier,field_coaching_flag,travel_intensity_band,home_office_state,current_status,source_system
+REP001,Ava Reynolds,Northeast,T01,New York,Oncology,Mid,2022-08-30,MGR001,North East Lead,High,1,Medium,0,High,CA,Active,Synthetic Rep Master
+REP002,Noah Bennett,Midwest,T02,Philadelphia,Cardiology,Junior,2023-01-22,MGR002,Central Lead,Medium,1,High,1,High,TX,Active,Synthetic Rep Master
+REP003,Mia Carter,South,T04,Atlanta,Immunology,Mid,2019-05-15,MGR003,South Lead,Low,1,High,1,High,CA,PIP Watch,Synthetic Rep Master
+REP004,Ethan Brooks,West,T06,Dallas,Oncology,Senior,2022-01-31,MGR004,Southeast Lead,Low,1,Medium,0,Low,MA,Active,Synthetic Rep Master
+REP005,Sophia Patel,Northeast,T01,Miami,Cardiology,Lead,2022-06-27,MGR005,West Lead,Medium,1,Medium,0,Low,TX,Active,Synthetic Rep Master
+REP006,Liam Chen,Midwest,T02,Chicago,Immunology,Mid,2021-05-26,MGR006,National Lead,Medium,1,High,1,Medium,CA,Active,Synthetic Rep Master
+REP007,Olivia Harris,South,T04,Atlanta,Oncology,Mid,2022-11-06,MGR001,North East Lead,Medium,1,Medium,0,Low,MA,Active,Synthetic Rep Master
+REP008,Lucas Walker,West,T06,New York,Cardiology,Senior,2020-11-03,MGR002,Central Lead,High,1,Medium,1,Low,CA,Active,Synthetic Rep Master
+REP009,Isabella King,Northeast,T01,Atlanta,Immunology,Mid,2022-01-10,MGR003,South Lead,Medium,1,High,1,Medium,NY,Active,Synthetic Rep Master
+REP010,Mason Scott,Midwest,T02,San Diego,Oncology,Junior,2020-02-04,MGR004,Southeast Lead,Medium,1,Medium,1,Low,TX,Active,Synthetic Rep Master
+REP011,Amelia Turner,South,T04,Philadelphia,Cardiology,Mid,2019-09-12,MGR005,West Lead,Medium,1,Medium,1,Medium,TX,Active,Synthetic Rep Master
+REP012,Benjamin Hall,West,T06,Atlanta,Immunology,Junior,2020-01-06,MGR006,National Lead,Low,1,High,0,Low,NY,Active,Synthetic Rep Master
+REP013,Charlotte Young,Northeast,T01,Miami,Oncology,Senior,2018-12-02,MGR001,North East Lead,Medium,1,Medium,0,Medium,GA,Active,Synthetic Rep Master
+REP014,Henry Adams,Midwest,T02,Dallas,Cardiology,Junior,2020-01-16,MGR002,Central Lead,High,1,Medium,0,High,FL,Active,Synthetic Rep Master
+REP015,Harper Lewis,South,T04,Dallas,Immunology,Mid,2022-04-27,MGR003,South Lead,Medium,1,Low,1,Medium,CA,Active,Synthetic Rep Master
+REP016,Elijah Nelson,West,T06,Chicago,Oncology,Mid,2021-04-18,MGR004,Southeast Lead,High,1,High,1,Medium,NJ,Active,Synthetic Rep Master
+REP017,Evelyn Moore,Northeast,T01,Chicago,Cardiology,Senior,2021-07-09,MGR005,West Lead,Low,1,Medium,0,Medium,NJ,Active,Synthetic Rep Master
+REP018,James Clark,Midwest,T02,Dallas,Immunology,Junior,2019-01-21,MGR006,National Lead,Low,1,High,1,Medium,GA,Active,Synthetic Rep Master

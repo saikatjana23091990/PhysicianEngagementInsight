@@ -1,0 +1,201 @@
+interaction_id,hcp_id,rep_id,channel,account_id,product_id,discussion_topic,duration_minutes,objective_type,objection_raised_flag,follow_up_required_flag,call_outcome,crm_note_raw,next_step_raw,interaction_datetime
+INT00117,HCP0012,REP002,In-person,ACC007,PRD001,Dosing,12,Medical question,1,0,No Access,Mean eye staff rule.,Schedule next visit,2025-01-05T17:00:00
+INT00151,HCP0038,REP011,Virtual,ACC005,PRD002,Safety,5,Sample request,0,1,Neutral,Oil offer knowledge hospital sign open matter. Young lot far turn beat story.,No action,2025-01-09T17:15:00
+INT00170,HCP0006,REP004,Phone,ACC010,PRD004,Dosing,10,Access discussion,0,1,Neutral,Yet travel think few themselves. Behavior growth bar professor power.,Schedule next visit,2025-01-12T18:00:00
+INT00071,HCP0014,REP008,Phone,ACC012,PRD007,Dosing,7,Detail,0,0,Neutral,Save material hit.,Share payer update,2025-01-15T09:30:00
+INT00045,HCP0049,REP009,In-person,ACC004,PRD007,Safety,14,Detail,0,0,No Access,Position always remain yard model particular hair.,Send clinical deck,2025-01-15T12:30:00
+INT00128,HCP0008,REP016,Phone,ACC011,PRD004,Dosing,16,Sample request,1,0,No Access,Include successful discuss.,Share payer update,2025-01-17T14:15:00
+INT00084,HCP0002,REP015,In-person,ACC006,PRD003,Safety,14,Medical question,0,1,Neutral,Anything no guy eye hit late.,Share payer update,2025-01-18T09:15:00
+INT00060,HCP0002,REP006,Phone,ACC006,PRD006,Safety,14,Sample request,0,0,No Access,Window attack moment medical write never hospital.,Schedule next visit,2025-01-21T15:45:00
+INT00094,HCP0037,REP003,Phone,ACC006,PRD008,Trial Data,21,Medical question,0,0,Needs Follow-up,Among western bad under pretty.,Schedule next visit,2025-01-24T17:30:00
+INT00187,HCP0042,REP002,Email,ACC004,PRD003,Efficacy,6,Follow-up,1,0,Positive,Physical many member area teacher cold church.,Share payer update,2025-01-24T18:45:00
+INT00100,HCP0049,REP012,Virtual,ACC004,PRD005,Efficacy,12,Access discussion,0,0,No Access,Writer myself management voice surface life cover.,Arrange MSL follow-up,2025-01-25T12:45:00
+INT00189,HCP0018,REP006,Phone,ACC001,PRD003,Access,16,Detail,0,0,Neutral,Turn condition whether along sort research. Different eat trouble floor step number.,Share payer update,2025-01-27T18:30:00
+INT00159,HCP0005,REP005,Virtual,ACC005,PRD009,Safety,12,Medical question,0,0,Needs Follow-up,Weight machine crime himself no president.,Arrange MSL follow-up,2025-02-02T14:30:00
+INT00057,HCP0041,REP015,In-person,ACC002,PRD005,Access,21,Detail,0,1,Positive,Social case expert stop receive catch.,Schedule next visit,2025-02-04T15:30:00
+INT00192,HCP0034,REP005,Phone,ACC004,PRD009,Patient Selection,17,Sample request,0,1,Neutral,Drug happy will young simply run national somebody.,Share payer update,2025-02-05T17:00:00
+INT00081,HCP0015,REP014,In-person,ACC011,PRD008,Access,13,Detail,0,0,Needs Follow-up,War ten industry while total.,Schedule next visit,2025-02-10T17:15:00
+INT00157,HCP0014,REP001,In-person,ACC012,PRD002,Dosing,15,Detail,0,0,No Access,Health center home others.,Send clinical deck,2025-02-15T16:00:00
+INT00097,HCP0041,REP018,Email,ACC002,PRD004,Dosing,11,Medical question,0,0,Positive,Fly position traditional become off.,Send clinical deck,2025-02-24T11:45:00
+INT00163,HCP0043,REP012,Email,ACC007,PRD010,Patient Selection,17,Follow-up,1,0,Positive,Technology particular into pattern size spend. Now mother others collection.,Share payer update,2025-02-28T11:15:00
+INT00087,HCP0018,REP007,Phone,ACC001,PRD001,Safety,17,Detail,0,1,Needs Follow-up,Order medical meeting majority none. Staff happy purpose woman on someone rise.,Send clinical deck,2025-03-04T09:45:00
+INT00073,HCP0037,REP010,Virtual,ACC006,PRD005,Efficacy,5,Detail,1,1,Positive,Young specific whose worry property remember.,No action,2025-03-04T11:45:00
+INT00190,HCP0022,REP003,Email,ACC003,PRD005,Patient Selection,3,Sample request,0,0,Neutral,Pull apply development middle animal husband theory.,Share payer update,2025-03-09T11:45:00
+INT00126,HCP0018,REP015,Email,ACC001,PRD007,Patient Selection,20,Medical question,0,1,Positive,Result far cultural discover now early nearly want. Either start whom politics make collection.,Share payer update,2025-03-09T14:45:00
+INT00164,HCP0034,REP016,In-person,ACC004,PRD010,Trial Data,7,Medical question,1,0,No Access,Of weight method too spring.,No action,2025-03-13T12:15:00
+INT00155,HCP0026,REP009,Virtual,ACC012,PRD002,Access,13,Sample request,0,0,Positive,Son Mr hand culture. Energy television month police.,Schedule next visit,2025-03-20T18:15:00
+INT00092,HCP0043,REP006,In-person,ACC007,PRD001,Dosing,5,Sample request,0,1,Needs Follow-up,Relate real major look night.,Arrange MSL follow-up,2025-03-24T11:30:00
+INT00143,HCP0008,REP015,Phone,ACC011,PRD005,Trial Data,20,Medical question,0,1,Positive,Factor hold be. Toward within occur college herself catch feeling.,No action,2025-03-28T13:15:00
+INT00020,HCP0043,REP006,Phone,ACC007,PRD004,Safety,18,Access discussion,0,0,No Access,Music sometimes body term.,Schedule next visit,2025-03-29T09:45:00
+INT00107,HCP0019,REP016,Phone,ACC009,PRD008,Patient Selection,10,Detail,0,0,Positive,Quite other skin moment month.,Share payer update,2025-03-29T18:45:00
+INT00119,HCP0027,REP007,Virtual,ACC004,PRD004,Patient Selection,19,Sample request,0,0,Positive,Many win walk provide skill five indicate. Feel contain Mrs drive.,Arrange MSL follow-up,2025-03-31T18:45:00
+INT00162,HCP0019,REP011,Virtual,ACC009,PRD002,Access,21,Follow-up,0,0,Needs Follow-up,Enjoy television beautiful tend bring speech decide.,Share payer update,2025-04-01T13:30:00
+INT00173,HCP0024,REP011,Virtual,ACC012,PRD004,Access,19,Sample request,1,1,No Access,Local director become south. Finish thing case similar.,No action,2025-04-11T09:30:00
+INT00142,HCP0030,REP005,Phone,ACC002,PRD008,Dosing,18,Access discussion,0,0,No Access,Government behavior our foot.,Share payer update,2025-04-11T11:45:00
+INT00078,HCP0043,REP010,In-person,ACC007,PRD003,Efficacy,12,Access discussion,1,1,No Access,American tell ball we side enough decision. Indicate police marriage phone face what lot.,Schedule next visit,2025-04-14T11:00:00
+INT00009,HCP0038,REP002,In-person,ACC005,PRD001,Dosing,17,Medical question,0,0,Neutral,Seat strategy total simply discover soon despite couple.,Arrange MSL follow-up,2025-04-15T16:15:00
+INT00096,HCP0004,REP015,In-person,ACC008,PRD003,Dosing,13,Sample request,1,0,Needs Follow-up,Race case who within. Imagine various there local.,No action,2025-04-15T17:15:00
+INT00034,HCP0013,REP018,In-person,ACC007,PRD007,Patient Selection,7,Access discussion,0,0,Neutral,Accept thank not husband center plan. Begin most heavy.,Arrange MSL follow-up,2025-04-17T11:15:00
+INT00109,HCP0031,REP017,Virtual,ACC006,PRD003,Patient Selection,13,Follow-up,1,1,Needs Follow-up,Major together knowledge argue car indeed nor next.,No action,2025-04-17T13:45:00
+INT00113,HCP0003,REP016,In-person,ACC003,PRD005,Safety,7,Detail,0,0,Positive,President girl condition Mr. Camera without strong series without leg rest.,No action,2025-04-20T16:30:00
+INT00180,HCP0043,REP018,In-person,ACC007,PRD007,Access,4,Medical question,0,0,Positive,Expert Republican short interest I policy Mrs. Everyone finally memory data.,Share payer update,2025-04-22T09:15:00
+INT00037,HCP0050,REP017,Virtual,ACC008,PRD009,Patient Selection,3,Detail,1,0,No Access,Face build market issue can.,Send clinical deck,2025-04-24T08:30:00
+INT00044,HCP0007,REP016,Email,ACC004,PRD004,Efficacy,11,Access discussion,0,0,Positive,Painting may whatever late specific study.,No action,2025-04-25T13:30:00
+INT00018,HCP0047,REP010,Email,ACC010,PRD006,Trial Data,6,Medical question,0,1,Needs Follow-up,Production politics others again. During call north attention share debate.,Send clinical deck,2025-04-27T09:45:00
+INT00191,HCP0021,REP003,Email,ACC006,PRD001,Access,13,Sample request,0,0,No Access,Force network account customer nor.,Arrange MSL follow-up,2025-04-28T09:00:00
+INT00175,HCP0048,REP004,In-person,ACC010,PRD001,Dosing,7,Access discussion,1,0,Neutral,Physical character in rather team. To cause but role.,No action,2025-05-03T09:15:00
+INT00067,HCP0041,REP018,In-person,ACC002,PRD002,Dosing,21,Medical question,1,0,No Access,Knowledge response coach know language.,No action,2025-05-03T15:15:00
+INT00147,HCP0049,REP005,In-person,ACC004,PRD007,Safety,11,Medical question,0,0,No Access,Same plan whose site for. Staff hotel box nor or.,Share payer update,2025-05-04T17:30:00
+INT00095,HCP0027,REP016,Virtual,ACC004,PRD009,Trial Data,5,Detail,0,0,No Access,Dark Mrs usually receive case. Scientist dream anything toward difficult do beyond form.,Share payer update,2025-05-06T14:30:00
+INT00194,HCP0027,REP005,Phone,ACC004,PRD001,Dosing,20,Access discussion,0,1,Positive,Ability price support road billion morning.,Schedule next visit,2025-05-07T18:00:00
+INT00035,HCP0021,REP018,Phone,ACC006,PRD004,Safety,3,Sample request,0,1,Needs Follow-up,Church find food walk other third. Church pay purpose evening.,Send clinical deck,2025-05-09T09:00:00
+INT00021,HCP0042,REP015,In-person,ACC004,PRD006,Trial Data,20,Follow-up,0,0,Needs Follow-up,Group small open.,No action,2025-05-11T08:45:00
+INT00121,HCP0045,REP001,Email,ACC009,PRD007,Trial Data,6,Medical question,0,0,No Access,Morning home effort form bad last he. Right couple environmental purpose owner them could.,No action,2025-05-14T13:15:00
+INT00036,HCP0012,REP006,Email,ACC007,PRD006,Efficacy,5,Medical question,1,0,Positive,Parent increase democratic mention generation book question. Main project animal house out account feeling deep.,Share payer update,2025-05-16T10:45:00
+INT00083,HCP0049,REP014,Virtual,ACC004,PRD010,Trial Data,14,Access discussion,0,0,Neutral,Anything manager think. Experience account blue care enough hand idea.,No action,2025-05-21T08:00:00
+INT00134,HCP0031,REP010,Virtual,ACC006,PRD009,Efficacy,20,Medical question,0,0,No Access,Matter its six not.,No action,2025-05-21T16:15:00
+INT00131,HCP0035,REP005,Virtual,ACC003,PRD005,Safety,22,Detail,0,0,Positive,Modern drive people education.,Send clinical deck,2025-05-22T09:00:00
+INT00069,HCP0024,REP004,Virtual,ACC012,PRD002,Efficacy,19,Follow-up,1,0,Neutral,Attack sing hand him.,Share payer update,2025-05-26T10:30:00
+INT00001,HCP0026,REP016,In-person,ACC012,PRD009,Efficacy,17,Detail,0,0,Neutral,Moment lead reveal improve. Avoid sit enter perhaps.,Share payer update,2025-05-30T11:30:00
+INT00050,HCP0010,REP007,In-person,ACC009,PRD004,Safety,13,Detail,0,0,No Access,Difficult case baby such big. Strong this also from short capital heavy.,Arrange MSL follow-up,2025-06-04T10:30:00
+INT00199,HCP0019,REP003,Phone,ACC009,PRD003,Efficacy,20,Sample request,1,1,Positive,All identify laugh security.,Schedule next visit,2025-06-08T16:15:00
+INT00041,HCP0043,REP014,Phone,ACC007,PRD009,Trial Data,18,Detail,0,0,Positive,Road standard spring door chair culture. Check service away week physical less nor often.,Share payer update,2025-06-10T12:30:00
+INT00059,HCP0031,REP007,Email,ACC006,PRD006,Patient Selection,17,Detail,0,1,Positive,Book toward others administration. Offer responsibility fact ability good number cost.,No action,2025-06-14T15:15:00
+INT00019,HCP0026,REP002,In-person,ACC012,PRD009,Efficacy,16,Follow-up,0,1,No Access,Forget challenge too able teach.,No action,2025-06-16T12:30:00
+INT00029,HCP0043,REP018,Virtual,ACC007,PRD009,Patient Selection,12,Medical question,0,0,Positive,What no prove improve them wait institution trouble.,Send clinical deck,2025-06-17T11:00:00
+INT00137,HCP0014,REP007,In-person,ACC012,PRD005,Trial Data,5,Access discussion,0,0,Needs Follow-up,Federal nor note support. Forward sense cause write right may window.,Share payer update,2025-06-19T09:45:00
+INT00062,HCP0026,REP005,In-person,ACC012,PRD006,Efficacy,12,Medical question,0,1,Positive,Sign same forward and. Full poor store range wonder long consider.,Schedule next visit,2025-06-20T17:15:00
+INT00006,HCP0031,REP016,Email,ACC006,PRD003,Access,8,Sample request,1,1,No Access,Central leave effect effort act source top quality. Available war write federal.,Schedule next visit,2025-06-28T13:30:00
+INT00174,HCP0034,REP004,In-person,ACC004,PRD003,Dosing,22,Access discussion,0,1,Neutral,Attention none particular clearly.,Schedule next visit,2025-06-28T15:15:00
+INT00156,HCP0023,REP015,Email,ACC005,PRD001,Dosing,8,Medical question,1,1,No Access,Particularly only girl suddenly pay sport. Try opportunity public finish draw.,Send clinical deck,2025-07-04T09:15:00
+INT00141,HCP0048,REP007,Phone,ACC010,PRD006,Dosing,7,Detail,0,1,No Access,Guess before wall know seven bill. Cost large never impact.,Schedule next visit,2025-07-09T14:00:00
+INT00085,HCP0023,REP012,In-person,ACC005,PRD002,Access,15,Sample request,0,0,Positive,Stay perhaps particularly campaign benefit. Some fund voice sense current meeting.,Send clinical deck,2025-07-10T09:15:00
+INT00063,HCP0041,REP018,Email,ACC002,PRD005,Trial Data,16,Access discussion,0,0,Needs Follow-up,Respond want already cut.,Schedule next visit,2025-07-12T13:15:00
+INT00014,HCP0017,REP018,Phone,ACC003,PRD002,Access,21,Medical question,0,0,Positive,Positive play less red power. Cause watch fight manage.,Schedule next visit,2025-07-13T13:15:00
+INT00051,HCP0015,REP005,Email,ACC011,PRD005,Patient Selection,15,Detail,1,0,No Access,Story side speak close.,Send clinical deck,2025-07-14T11:30:00
+INT00112,HCP0049,REP018,In-person,ACC004,PRD001,Access,4,Sample request,0,0,No Access,Hear through large true help bag.,Schedule next visit,2025-07-14T13:15:00
+INT00172,HCP0040,REP014,In-person,ACC005,PRD010,Efficacy,5,Access discussion,0,1,Neutral,Back order mind knowledge account gas building.,Schedule next visit,2025-07-19T11:15:00
+INT00054,HCP0020,REP003,In-person,ACC008,PRD001,Dosing,8,Detail,0,1,Neutral,Them never bill suffer surface expect several.,Schedule next visit,2025-07-22T13:15:00
+INT00090,HCP0023,REP010,Virtual,ACC005,PRD002,Trial Data,21,Detail,0,0,Positive,Industry include data maybe particularly likely. Relationship million night your.,Share payer update,2025-07-23T15:45:00
+INT00068,HCP0031,REP017,In-person,ACC006,PRD009,Safety,4,Medical question,0,1,Positive,Your ever woman way avoid point guy song. Well central parent sit.,No action,2025-08-03T11:15:00
+INT00108,HCP0002,REP011,Virtual,ACC006,PRD004,Safety,19,Access discussion,1,1,Positive,True born stock total. Of change foreign minute break.,Arrange MSL follow-up,2025-08-03T14:15:00
+INT00176,HCP0028,REP013,Phone,ACC002,PRD003,Safety,18,Sample request,0,0,Needs Follow-up,Fire cause everybody base network outside. Expect wait agree suggest then day parent country.,Share payer update,2025-08-05T15:15:00
+INT00171,HCP0047,REP018,Phone,ACC010,PRD005,Access,8,Medical question,1,0,Neutral,Personal rise sense investment before believe.,Share payer update,2025-08-07T11:45:00
+INT00040,HCP0038,REP007,In-person,ACC005,PRD010,Access,17,Medical question,1,1,Positive,Develop single baby plan most create.,Schedule next visit,2025-08-09T11:45:00
+INT00003,HCP0021,REP010,Virtual,ACC006,PRD009,Efficacy,11,Access discussion,1,0,Positive,Section its better plant their.,No action,2025-08-13T15:30:00
+INT00032,HCP0034,REP015,In-person,ACC004,PRD006,Safety,20,Sample request,0,0,Needs Follow-up,Suddenly window stand party poor ago.,Arrange MSL follow-up,2025-08-16T13:00:00
+INT00132,HCP0022,REP002,Phone,ACC003,PRD010,Patient Selection,4,Medical question,1,0,Neutral,Some bad where learn during. Feel stock ball yard practice.,Send clinical deck,2025-08-17T18:00:00
+INT00058,HCP0029,REP015,In-person,ACC004,PRD002,Efficacy,5,Detail,1,0,Positive,Past town affect democratic change vote participant. Book explain feeling answer information soldier.,Share payer update,2025-08-20T08:30:00
+INT00104,HCP0031,REP017,In-person,ACC006,PRD001,Safety,22,Sample request,0,0,Needs Follow-up,Old of end growth door. Let civil rather type.,No action,2025-08-22T17:15:00
+INT00099,HCP0030,REP017,Email,ACC002,PRD003,Access,5,Medical question,1,0,Neutral,Theory across nothing blue work.,No action,2025-08-28T12:45:00
+INT00120,HCP0010,REP005,In-person,ACC009,PRD006,Dosing,15,Follow-up,1,0,Needs Follow-up,Tax certain leg arm include.,Schedule next visit,2025-09-02T11:00:00
+INT00168,HCP0030,REP001,Email,ACC002,PRD007,Efficacy,6,Follow-up,0,0,Needs Follow-up,Front official not magazine gas. Animal phone student.,Share payer update,2025-09-05T12:45:00
+INT00178,HCP0021,REP015,Phone,ACC006,PRD005,Safety,12,Detail,0,0,Needs Follow-up,Hit stuff inside national. Several west side admit.,Arrange MSL follow-up,2025-09-08T09:00:00
+INT00030,HCP0039,REP010,Phone,ACC005,PRD007,Efficacy,15,Medical question,0,1,No Access,Outside goal official defense prevent.,No action,2025-09-10T09:15:00
+INT00086,HCP0007,REP006,In-person,ACC004,PRD006,Patient Selection,11,Medical question,0,1,Needs Follow-up,And case four. Mind chance throw cause use five hotel.,Share payer update,2025-09-13T14:00:00
+INT00196,HCP0002,REP008,Email,ACC006,PRD001,Trial Data,14,Sample request,0,0,No Access,Red head window be believe card. Avoid nothing itself who door end.,Schedule next visit,2025-09-13T17:00:00
+INT00133,HCP0019,REP005,In-person,ACC009,PRD003,Dosing,10,Sample request,0,1,Neutral,If help live PM.,Share payer update,2025-09-15T11:30:00
+INT00145,HCP0002,REP007,Virtual,ACC006,PRD008,Access,18,Detail,0,1,No Access,Leader career according how success. Sound forget friend spring teacher wind.,Send clinical deck,2025-09-16T13:00:00
+INT00102,HCP0008,REP013,Email,ACC011,PRD008,Access,7,Detail,1,0,Needs Follow-up,Compare task today still middle. Husband believe word local.,No action,2025-09-16T16:30:00
+INT00105,HCP0025,REP011,In-person,ACC001,PRD010,Patient Selection,18,Detail,0,0,Positive,Police wait happen determine.,Share payer update,2025-09-17T16:45:00
+INT00011,HCP0038,REP010,Virtual,ACC005,PRD003,Trial Data,18,Follow-up,1,1,Neutral,Often run bed. Force indeed customer skill theory.,Share payer update,2025-09-18T12:45:00
+INT00195,HCP0027,REP007,Virtual,ACC004,PRD009,Patient Selection,12,Detail,0,0,No Access,Man art young Republican behavior TV.,Send clinical deck,2025-09-23T16:15:00
+INT00169,HCP0033,REP007,Email,ACC005,PRD009,Access,17,Medical question,0,0,Needs Follow-up,Upon citizen lead yeah.,Send clinical deck,2025-09-24T13:45:00
+INT00075,HCP0016,REP003,Virtual,ACC010,PRD001,Dosing,18,Detail,1,0,Needs Follow-up,Hard sound necessary partner beat finally yourself. Moment shoulder statement available win politics last.,Send clinical deck,2025-09-26T09:00:00
+INT00124,HCP0001,REP015,Email,ACC012,PRD009,Trial Data,4,Access discussion,0,1,Neutral,Mention market better wonder light style.,Arrange MSL follow-up,2025-09-28T13:00:00
+INT00146,HCP0040,REP001,Email,ACC005,PRD002,Trial Data,19,Medical question,0,0,Positive,Fly water cut fire who.,No action,2025-09-29T12:30:00
+INT00182,HCP0009,REP012,In-person,ACC004,PRD008,Dosing,12,Sample request,0,1,Positive,Each under break partner.,Arrange MSL follow-up,2025-09-30T17:15:00
+INT00116,HCP0036,REP008,Virtual,ACC004,PRD001,Trial Data,8,Detail,1,0,Neutral,Scientist I doctor describe tell.,Schedule next visit,2025-10-01T08:15:00
+INT00088,HCP0033,REP018,Phone,ACC005,PRD008,Dosing,14,Access discussion,0,0,Neutral,Others enter pretty. Officer return on color pick people subject challenge.,Arrange MSL follow-up,2025-10-05T12:15:00
+INT00002,HCP0014,REP004,In-person,ACC012,PRD009,Safety,7,Detail,0,0,Needs Follow-up,System system teacher here. Phone thought maintain must pay doctor.,No action,2025-10-06T18:15:00
+INT00010,HCP0017,REP010,Email,ACC003,PRD010,Efficacy,10,Detail,1,0,Neutral,Pick tough position final.,Share payer update,2025-10-10T16:45:00
+INT00179,HCP0030,REP015,Email,ACC002,PRD001,Trial Data,11,Access discussion,0,1,Positive,Energy always art.,Share payer update,2025-10-17T15:00:00
+INT00023,HCP0032,REP012,Virtual,ACC001,PRD002,Dosing,11,Detail,0,1,No Access,Large gun order later develop past road.,Schedule next visit,2025-10-22T12:00:00
+INT00052,HCP0048,REP011,Virtual,ACC010,PRD002,Access,12,Detail,1,0,Needs Follow-up,Improve put down. Particular sell six doctor dream whole.,Arrange MSL follow-up,2025-10-22T17:45:00
+INT00184,HCP0003,REP005,Virtual,ACC003,PRD007,Trial Data,17,Detail,0,0,Needs Follow-up,Market get military state.,Schedule next visit,2025-10-23T12:45:00
+INT00165,HCP0040,REP016,Email,ACC005,PRD007,Access,14,Access discussion,0,0,Neutral,Try yeah term camera tend economic.,Schedule next visit,2025-10-26T16:45:00
+INT00160,HCP0011,REP016,Email,ACC008,PRD006,Patient Selection,7,Sample request,0,0,Needs Follow-up,Indeed style major bar air set factor. Different eye sit not significant.,No action,2025-11-01T11:45:00
+INT00082,HCP0002,REP015,Virtual,ACC006,PRD004,Trial Data,14,Medical question,0,1,Needs Follow-up,Return couple city you level these market. War measure whom Democrat.,No action,2025-11-05T14:15:00
+INT00024,HCP0001,REP008,In-person,ACC012,PRD002,Dosing,7,Detail,0,0,No Access,Leader who article look husband. Make travel available ball.,Send clinical deck,2025-11-07T11:15:00
+INT00093,HCP0001,REP010,Phone,ACC012,PRD002,Patient Selection,8,Access discussion,0,1,Positive,Business quality here woman stand.,Send clinical deck,2025-11-11T09:15:00
+INT00072,HCP0029,REP015,In-person,ACC004,PRD003,Efficacy,9,Follow-up,1,0,Needs Follow-up,Energy employee land you. Really your customer career available.,Arrange MSL follow-up,2025-11-12T09:00:00
+INT00114,HCP0034,REP008,Virtual,ACC004,PRD001,Safety,13,Medical question,0,1,Neutral,Here discover leave choice country themselves she. Special information she.,Send clinical deck,2025-11-23T08:00:00
+INT00022,HCP0041,REP010,In-person,ACC002,PRD008,Access,9,Medical question,1,0,Neutral,Enter camera inside box.,Share payer update,2025-11-24T12:45:00
+INT00166,HCP0047,REP006,In-person,ACC010,PRD003,Patient Selection,16,Detail,0,0,Needs Follow-up,Seven put majority officer environmental. Heart away some shoulder idea seek.,Arrange MSL follow-up,2025-11-28T08:45:00
+INT00140,HCP0050,REP018,In-person,ACC008,PRD001,Dosing,19,Medical question,1,0,No Access,Environmental here six child.,Schedule next visit,2025-11-29T12:30:00
+INT00017,HCP0049,REP013,In-person,ACC004,PRD002,Efficacy,18,Access discussion,0,1,Positive,Name within grow huge couple business.,Arrange MSL follow-up,2025-11-29T13:45:00
+INT00008,HCP0003,REP001,Email,ACC003,PRD004,Patient Selection,9,Access discussion,0,1,No Access,Not rate seat.,Share payer update,2025-12-03T15:45:00
+INT00048,HCP0001,REP015,Virtual,ACC012,PRD002,Access,11,Follow-up,0,0,No Access,True financial prevent product. Organization visit finally heavy.,Send clinical deck,2025-12-05T15:45:00
+INT00028,HCP0009,REP012,Virtual,ACC004,PRD008,Trial Data,14,Detail,0,0,Positive,It season head candidate.,No action,2025-12-11T18:30:00
+INT00152,HCP0012,REP013,Phone,ACC007,PRD002,Patient Selection,5,Access discussion,0,0,Positive,Find lay deal lot live just.,Share payer update,2025-12-13T13:45:00
+INT00110,HCP0024,REP012,Virtual,ACC012,PRD010,Trial Data,9,Follow-up,0,1,Needs Follow-up,How staff second.,Arrange MSL follow-up,2025-12-13T18:30:00
+INT00049,HCP0047,REP010,In-person,ACC010,PRD009,Trial Data,4,Follow-up,1,1,Positive,Prove stock school rate. Behavior provide meet adult final week game.,Send clinical deck,2025-12-14T17:45:00
+INT00091,HCP0026,REP015,Phone,ACC012,PRD009,Patient Selection,7,Medical question,0,0,Neutral,Heavy what least mouth national put test. Particular court east newspaper different.,Schedule next visit,2025-12-15T13:15:00
+INT00197,HCP0011,REP018,Email,ACC008,PRD010,Safety,21,Detail,0,0,Neutral,Red save fish evening avoid dark. Board black last finish building group show later.,Send clinical deck,2025-12-16T15:00:00
+INT00129,HCP0016,REP003,In-person,ACC010,PRD006,Trial Data,6,Follow-up,1,1,Neutral,Despite lay art.,Arrange MSL follow-up,2025-12-16T16:15:00
+INT00188,HCP0005,REP007,Phone,ACC005,PRD010,Safety,11,Detail,0,0,Positive,Purpose boy scientist able teach activity animal.,Schedule next visit,2025-12-19T18:30:00
+INT00122,HCP0039,REP010,In-person,ACC005,PRD007,Efficacy,22,Follow-up,0,0,No Access,Describe decade trade field training deep couple. Section senior trial receive.,Arrange MSL follow-up,2025-12-20T18:30:00
+INT00148,HCP0026,REP008,Email,ACC012,PRD004,Safety,5,Medical question,1,0,No Access,Race nearly well left. Just fact realize standard somebody.,Send clinical deck,2025-12-23T12:00:00
+INT00135,HCP0046,REP011,In-person,ACC004,PRD008,Access,15,Follow-up,1,0,Neutral,Try discover top realize note even under.,Schedule next visit,2025-12-23T14:15:00
+INT00149,HCP0049,REP001,Virtual,ACC004,PRD005,Safety,13,Access discussion,0,1,Positive,Cause field education child institution help last. Look husband media turn reality myself so growth.,Arrange MSL follow-up,2025-12-26T09:45:00
+INT00015,HCP0004,REP016,Virtual,ACC008,PRD001,Access,4,Follow-up,0,0,No Access,Thought career law provide sea.,Send clinical deck,2025-12-28T14:15:00
+INT00038,HCP0049,REP016,In-person,ACC004,PRD001,Access,22,Follow-up,0,0,Needs Follow-up,Matter street south author technology. Job least back.,No action,2025-12-31T09:00:00
+INT00039,HCP0044,REP018,Virtual,ACC011,PRD005,Dosing,19,Access discussion,1,0,Positive,Investment identify policy face if whom commercial. Least ready gun join black job hundred bad.,No action,2025-12-31T14:30:00
+INT00074,HCP0021,REP008,Email,ACC006,PRD004,Safety,22,Sample request,0,1,No Access,Face feel church remember record company gun. Building cut catch so ago.,Arrange MSL follow-up,2026-01-03T12:45:00
+INT00066,HCP0028,REP006,In-person,ACC002,PRD009,Access,10,Medical question,0,1,No Access,Wind many marriage under mind song. Bad own state nation fly bag.,Arrange MSL follow-up,2026-01-05T08:45:00
+INT00047,HCP0035,REP010,Email,ACC003,PRD004,Dosing,7,Follow-up,0,1,Positive,Question exist rich prevent trade their four.,Schedule next visit,2026-01-05T17:00:00
+INT00013,HCP0022,REP010,Phone,ACC003,PRD006,Dosing,17,Access discussion,1,0,Needs Follow-up,Hand so add Mr lawyer pull public. Herself police he push likely people wall foreign.,No action,2026-01-07T17:45:00
+INT00055,HCP0028,REP012,Email,ACC002,PRD001,Trial Data,7,Sample request,0,0,Neutral,Town challenge join watch develop later glass.,Send clinical deck,2026-01-08T10:15:00
+INT00101,HCP0012,REP009,Email,ACC007,PRD004,Dosing,15,Detail,0,0,Needs Follow-up,Class learn either control say so.,Send clinical deck,2026-01-08T14:30:00
+INT00200,HCP0049,REP014,Email,ACC004,PRD005,Safety,16,Detail,1,1,Positive,Left sound cause activity.,Schedule next visit,2026-01-09T08:15:00
+INT00025,HCP0005,REP012,In-person,ACC005,PRD001,Safety,16,Follow-up,0,0,Needs Follow-up,Assume every plan nature. Herself our far measure involve soldier.,No action,2026-01-10T09:30:00
+INT00046,HCP0029,REP005,Phone,ACC004,PRD001,Trial Data,15,Medical question,1,0,Neutral,Impact full our smile positive at.,Schedule next visit,2026-01-15T08:00:00
+INT00080,HCP0011,REP013,Phone,ACC008,PRD002,Access,18,Medical question,0,1,Needs Follow-up,Middle blood drop business last cell.,Send clinical deck,2026-01-16T14:30:00
+INT00042,HCP0001,REP004,Email,ACC012,PRD002,Trial Data,21,Access discussion,0,1,Positive,Follow wife firm key light place someone option. Medical financial later arm story baby.,Share payer update,2026-01-17T13:15:00
+INT00139,HCP0016,REP004,Virtual,ACC010,PRD004,Access,10,Access discussion,0,0,No Access,Why for plant situation late direction. Wait it quickly produce beat peace something.,Share payer update,2026-01-18T11:15:00
+INT00123,HCP0017,REP015,Virtual,ACC003,PRD002,Patient Selection,20,Follow-up,0,1,Positive,Trip need simply herself move grow.,No action,2026-01-18T13:45:00
+INT00167,HCP0008,REP017,Virtual,ACC011,PRD009,Patient Selection,14,Medical question,1,1,Neutral,Wear force able similar run room learn. Sure somebody huge why station manager.,Schedule next visit,2026-01-18T16:15:00
+INT00079,HCP0048,REP002,In-person,ACC010,PRD002,Trial Data,4,Sample request,0,0,Needs Follow-up,Law read citizen indeed less. Parent fine responsibility safe team wish.,Share payer update,2026-01-21T11:30:00
+INT00103,HCP0010,REP012,Email,ACC009,PRD007,Safety,4,Detail,0,1,Needs Follow-up,End dog send.,Share payer update,2026-01-22T11:45:00
+INT00130,HCP0047,REP001,Virtual,ACC010,PRD001,Efficacy,20,Medical question,0,0,No Access,Process administration mother in admit reveal movie. Admit spend purpose south travel.,Schedule next visit,2026-01-23T12:45:00
+INT00005,HCP0023,REP002,In-person,ACC005,PRD007,Safety,8,Access discussion,1,1,No Access,Company participant him raise.,Send clinical deck,2026-01-26T15:45:00
+INT00111,HCP0035,REP010,In-person,ACC003,PRD002,Dosing,18,Sample request,0,0,Positive,And general as yes. Worry line expert conference.,No action,2026-01-30T11:45:00
+INT00065,HCP0019,REP017,In-person,ACC009,PRD007,Patient Selection,22,Follow-up,1,0,Neutral,Education send course ground sit tend forward. Son join hundred keep.,Arrange MSL follow-up,2026-01-30T16:00:00
+INT00181,HCP0018,REP004,Virtual,ACC001,PRD009,Safety,8,Access discussion,0,0,Neutral,Force only shake power poor financial join.,Send clinical deck,2026-02-02T11:30:00
+INT00076,HCP0010,REP012,Email,ACC009,PRD008,Efficacy,21,Sample request,0,0,Needs Follow-up,Campaign stop necessary onto should can. Treat area buy check clearly follow remember.,No action,2026-02-08T13:15:00
+INT00089,HCP0027,REP008,In-person,ACC004,PRD004,Access,17,Access discussion,0,1,Positive,Occur red course.,Send clinical deck,2026-02-09T08:30:00
+INT00061,HCP0023,REP002,Email,ACC005,PRD006,Trial Data,13,Detail,1,0,Needs Follow-up,Player wonder effect. Ground attack drop.,No action,2026-02-09T18:30:00
+INT00106,HCP0045,REP010,Virtual,ACC009,PRD009,Trial Data,11,Access discussion,0,1,Positive,Check security paper indeed near likely Mr.,No action,2026-02-12T18:00:00
+INT00161,HCP0026,REP013,Virtual,ACC012,PRD009,Dosing,22,Follow-up,0,0,Neutral,Member of environmental myself yard my series. National wrong bill stop seem fear.,Share payer update,2026-02-16T15:30:00
+INT00136,HCP0002,REP005,Virtual,ACC006,PRD007,Access,20,Access discussion,0,0,Neutral,Nor allow up fire which onto sell.,Schedule next visit,2026-02-17T08:45:00
+INT00118,HCP0030,REP007,Virtual,ACC002,PRD004,Efficacy,11,Follow-up,0,1,Needs Follow-up,Our pull fly few century produce determine. Every news option same compare.,Schedule next visit,2026-02-19T13:15:00
+INT00007,HCP0028,REP013,Email,ACC002,PRD001,Patient Selection,13,Sample request,0,0,No Access,Lead few yourself table blood. Occur offer yeah far within probably.,No action,2026-02-21T08:45:00
+INT00077,HCP0012,REP011,Virtual,ACC007,PRD010,Trial Data,8,Follow-up,0,1,No Access,Thus suffer economy play nearly by field. Behavior political option oil commercial person top.,Send clinical deck,2026-02-21T10:45:00
+INT00127,HCP0042,REP009,Email,ACC004,PRD005,Efficacy,16,Sample request,0,1,Positive,Cause national contain threat. Model stuff avoid stand.,Send clinical deck,2026-02-23T11:00:00
+INT00186,HCP0002,REP014,In-person,ACC006,PRD007,Safety,12,Sample request,0,1,No Access,Friend investment model.,Schedule next visit,2026-02-27T15:30:00
+INT00053,HCP0041,REP015,Virtual,ACC002,PRD003,Trial Data,6,Follow-up,1,1,No Access,Happy water worker left example. Me industry class current painting their.,No action,2026-03-02T13:00:00
+INT00153,HCP0032,REP008,In-person,ACC001,PRD004,Efficacy,3,Sample request,1,0,Neutral,Attack and represent against gas body. Upon scientist might necessary.,Schedule next visit,2026-03-06T13:45:00
+INT00144,HCP0040,REP002,Email,ACC005,PRD002,Efficacy,16,Follow-up,0,0,Neutral,As itself inside machine. Guess want result many.,Send clinical deck,2026-03-06T18:00:00
+INT00125,HCP0040,REP011,Phone,ACC005,PRD007,Patient Selection,21,Medical question,0,1,No Access,Fine animal ten scientist administration network.,Send clinical deck,2026-03-14T15:00:00
+INT00193,HCP0048,REP015,Phone,ACC010,PRD004,Safety,6,Access discussion,1,0,No Access,Usually agency must.,Schedule next visit,2026-03-17T09:00:00
+INT00027,HCP0045,REP008,In-person,ACC009,PRD003,Trial Data,5,Medical question,0,0,Positive,Interview professor hear check type attack.,Share payer update,2026-03-17T18:45:00
+INT00177,HCP0026,REP002,Phone,ACC012,PRD010,Dosing,9,Medical question,1,0,No Access,Position six soldier dream history. Matter order month within would.,Share payer update,2026-03-20T08:45:00
+INT00138,HCP0015,REP002,Virtual,ACC011,PRD001,Efficacy,9,Sample request,0,0,Neutral,Join stuff future shoulder.,Arrange MSL follow-up,2026-03-24T11:15:00
+INT00043,HCP0035,REP012,In-person,ACC003,PRD004,Trial Data,22,Sample request,0,0,Neutral,Order his oil west school American training occur.,Arrange MSL follow-up,2026-03-24T14:00:00
+INT00031,HCP0015,REP005,Virtual,ACC011,PRD004,Access,22,Medical question,0,0,Needs Follow-up,Glass news boy everything.,Arrange MSL follow-up,2026-03-30T18:00:00
+INT00004,HCP0031,REP002,Email,ACC006,PRD009,Access,5,Follow-up,0,1,Needs Follow-up,Really tough animal someone. Grow issue each include radio.,No action,2026-04-01T13:30:00
+INT00150,HCP0044,REP007,In-person,ACC011,PRD003,Trial Data,4,Detail,0,1,Positive,Point be shoulder price great positive and worker. Whom former someone black better develop.,Arrange MSL follow-up,2026-04-07T17:45:00
+INT00158,HCP0031,REP018,Virtual,ACC006,PRD001,Safety,8,Follow-up,0,0,Needs Follow-up,Institution main Mr try us community. Majority cell fire late.,Share payer update,2026-04-09T17:15:00
+INT00016,HCP0047,REP017,Virtual,ACC010,PRD007,Access,7,Detail,1,0,Needs Follow-up,Onto risk those pressure street past. Allow have kitchen wear talk.,No action,2026-04-12T08:15:00
+INT00026,HCP0005,REP017,Virtual,ACC005,PRD006,Dosing,12,Sample request,0,0,Positive,Result Democrat later direction fund law indeed.,Arrange MSL follow-up,2026-04-13T10:30:00
+INT00183,HCP0020,REP014,Phone,ACC008,PRD009,Efficacy,10,Follow-up,0,0,No Access,Program price compare actually case.,Share payer update,2026-04-16T12:15:00
+INT00012,HCP0029,REP007,Email,ACC004,PRD006,Patient Selection,11,Medical question,0,1,Needs Follow-up,Maybe evening clearly trial want whose far. Sound life away senior difficult put.,Send clinical deck,2026-04-17T16:15:00
+INT00070,HCP0026,REP012,Virtual,ACC012,PRD005,Efficacy,19,Sample request,0,0,Positive,Painting quickly we. Know baby case happen fire everything.,Schedule next visit,2026-04-22T14:00:00
+INT00154,HCP0009,REP018,Virtual,ACC004,PRD004,Access,5,Access discussion,0,0,Positive,Interview left something picture control price how. Third last involve above Democrat everything region somebody.,Send clinical deck,2026-04-27T14:15:00
+INT00098,HCP0007,REP010,Phone,ACC004,PRD008,Access,8,Sample request,0,0,Neutral,Tree company think. Value already structure small.,Share payer update,2026-04-30T17:45:00
+INT00033,HCP0001,REP004,Email,ACC012,PRD006,Access,4,Sample request,0,0,Neutral,Congress reflect finally.,Send clinical deck,2026-05-01T09:15:00
+INT00198,HCP0021,REP002,Virtual,ACC006,PRD002,Access,16,Medical question,0,1,Neutral,System bed space fight relate. American structure foreign before eat green message quality.,Schedule next visit,2026-05-01T16:30:00
+INT00185,HCP0014,REP015,Email,ACC012,PRD005,Access,17,Sample request,0,1,No Access,Head seek them run.,Arrange MSL follow-up,2026-05-02T13:00:00
+INT00064,HCP0004,REP006,Phone,ACC008,PRD001,Safety,10,Follow-up,0,0,Needs Follow-up,Firm financial huge.,Send clinical deck,2026-05-02T13:45:00
+INT00056,HCP0019,REP006,Virtual,ACC009,PRD005,Trial Data,21,Access discussion,0,1,Needs Follow-up,Apply maybe dog yes heart agreement.,Arrange MSL follow-up,2026-05-03T15:45:00
+INT00115,HCP0014,REP018,Virtual,ACC012,PRD007,Safety,9,Sample request,0,0,Positive,Deal beyond almost our reflect.,Send clinical deck,2026-05-16T14:45:00

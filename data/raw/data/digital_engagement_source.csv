@@ -1,0 +1,81 @@
+engagement_id,hcp_id,account_id,campaign_id,engagement_date,touchpoint,engagement_event,engagement_value,device_type,source_system
+DIG00001,HCP0012,ACC007,CMP011,2024-02-07,Web visit,Rep Email,8,Tablet,Veeva
+DIG00002,HCP0009,ACC004,CMP007,2025-03-05,Asset download,Webinar Attend,93,Tablet,Veeva
+DIG00003,HCP0039,ACC005,CMP001,2024-12-18,Banner,Rep Email,79,Desktop,Webinar platform
+DIG00004,HCP0039,ACC005,CMP011,2025-04-01,Web visit,Rep Email,80,Tablet,Webinar platform
+DIG00005,HCP0044,ACC011,CMP006,2025-12-15,Webinar registration,Click,39,Desktop,GA4
+DIG00006,HCP0027,ACC004,CMP006,2025-07-04,Webinar registration,Click,67,Tablet,Veeva
+DIG00007,HCP0015,ACC011,CMP002,2024-08-06,Asset download,Rep Email,40,Tablet,Veeva
+DIG00008,HCP0012,ACC007,CMP003,2025-10-12,Email,Open,70,Tablet,Veeva
+DIG00009,HCP0024,ACC012,CMP005,2024-09-04,Webinar registration,Rep Email,15,Tablet,GA4
+DIG00010,HCP0015,ACC011,CMP005,2025-01-16,Asset download,Webinar Attend,16,Desktop,GA4
+DIG00011,HCP0016,ACC010,CMP005,2025-04-04,Asset download,Open,59,Mobile,Marketing Cloud
+DIG00012,HCP0013,ACC007,CMP010,2025-08-18,Asset download,Rep Email,30,Mobile,Veeva
+DIG00013,HCP0017,ACC003,CMP011,2024-10-18,Asset download,Click,92,Mobile,Marketing Cloud
+DIG00014,HCP0037,ACC006,CMP006,2024-04-17,Asset download,Rep Email,25,Mobile,Webinar platform
+DIG00015,HCP0008,ACC011,CMP003,2024-04-10,Webinar registration,Paper Download,11,Desktop,GA4
+DIG00016,HCP0047,ACC010,CMP003,2025-03-11,Webinar registration,Click,58,Desktop,Veeva
+DIG00017,HCP0008,ACC011,CMP009,2025-11-24,Webinar registration,Rep Email,72,Tablet,Webinar platform
+DIG00018,HCP0031,ACC006,CMP010,2024-09-27,Webinar registration,Paper Download,57,Tablet,Webinar platform
+DIG00019,HCP0046,ACC004,CMP007,2026-01-19,Web visit,Click,65,Desktop,Webinar platform
+DIG00020,HCP0031,ACC006,CMP008,2025-12-29,Web visit,Rep Email,68,Desktop,Marketing Cloud
+DIG00021,HCP0003,ACC003,CMP008,2025-04-11,Email,Click,72,Mobile,GA4
+DIG00022,HCP0003,ACC003,CMP007,2025-09-08,Email,Open,48,Tablet,Veeva
+DIG00023,HCP0009,ACC004,CMP009,2024-02-11,Web visit,Open,48,Mobile,Veeva
+DIG00024,HCP0019,ACC009,CMP005,2024-11-06,Webinar registration,Open,19,Desktop,Webinar platform
+DIG00025,HCP0038,ACC005,CMP005,2024-02-19,Banner,Click,24,Tablet,Webinar platform
+DIG00026,HCP0029,ACC004,CMP002,2024-01-03,Asset download,Webinar Attend,9,Desktop,Webinar platform
+DIG00027,HCP0004,ACC008,CMP010,2025-05-07,Banner,Rep Email,58,Mobile,Webinar platform
+DIG00028,HCP0007,ACC004,CMP012,2025-05-01,Asset download,Click,98,Desktop,Webinar platform
+DIG00029,HCP0001,ACC012,CMP011,2025-04-05,Webinar registration,Click,94,Mobile,GA4
+DIG00030,HCP0032,ACC001,CMP011,2025-10-01,Asset download,Paper Download,50,Desktop,Webinar platform
+DIG00031,HCP0017,ACC003,CMP009,2024-12-13,Email,Paper Download,95,Mobile,GA4
+DIG00032,HCP0044,ACC011,CMP012,2024-06-18,Email,Rep Email,81,Tablet,Veeva
+DIG00033,HCP0001,ACC012,CMP011,2025-07-28,Email,Rep Email,11,Desktop,GA4
+DIG00034,HCP0033,ACC005,CMP009,2025-08-06,Web visit,Paper Download,65,Desktop,GA4
+DIG00035,HCP0005,ACC005,CMP009,2025-11-05,Web visit,Open,36,Desktop,Marketing Cloud
+DIG00036,HCP0018,ACC001,CMP010,2025-12-23,Webinar registration,Open,69,Tablet,Veeva
+DIG00037,HCP0030,ACC002,CMP010,2025-02-15,Email,Paper Download,3,Mobile,Webinar platform
+DIG00038,HCP0019,ACC009,CMP007,2024-07-03,Email,Rep Email,41,Mobile,Veeva
+DIG00039,HCP0004,ACC008,CMP002,2024-04-03,Email,Rep Email,22,Mobile,Marketing Cloud
+DIG00040,HCP0046,ACC004,CMP005,2024-07-06,Email,Click,40,Mobile,Marketing Cloud
+DIG00041,HCP0043,ACC007,CMP010,2024-03-01,Banner,Click,4,Tablet,GA4
+DIG00042,HCP0046,ACC004,CMP007,2024-11-01,Email,Webinar Attend,19,Mobile,Veeva
+DIG00043,HCP0045,ACC009,CMP007,2024-09-21,Email,Open,26,Desktop,Marketing Cloud
+DIG00044,HCP0014,ACC012,CMP009,2025-05-19,Asset download,Paper Download,15,Mobile,GA4
+DIG00045,HCP0031,ACC006,CMP008,2024-11-21,Asset download,Paper Download,9,Mobile,GA4
+DIG00046,HCP0007,ACC004,CMP011,2025-02-21,Web visit,Open,35,Tablet,GA4
+DIG00047,HCP0041,ACC002,CMP009,2024-09-09,Web visit,Webinar Attend,73,Mobile,Webinar platform
+DIG00048,HCP0046,ACC004,CMP011,2024-03-26,Asset download,Click,19,Mobile,Marketing Cloud
+DIG00049,HCP0035,ACC003,CMP009,2024-09-08,Webinar registration,Rep Email,58,Desktop,GA4
+DIG00050,HCP0045,ACC009,CMP010,2025-04-20,Banner,Click,1,Desktop,Webinar platform
+DIG00051,HCP0038,ACC005,CMP010,2024-10-06,Banner,Paper Download,45,Tablet,Marketing Cloud
+DIG00052,HCP0047,ACC010,CMP009,2025-08-22,Banner,Open,21,Tablet,GA4
+DIG00053,HCP0049,ACC004,CMP002,2024-11-03,Webinar registration,Open,18,Tablet,Veeva
+DIG00054,HCP0026,ACC012,CMP004,2025-03-18,Asset download,Rep Email,41,Tablet,Veeva
+DIG00055,HCP0042,ACC004,CMP005,2025-10-12,Webinar registration,Webinar Attend,32,Tablet,Veeva
+DIG00056,HCP0042,ACC004,CMP004,2024-12-15,Webinar registration,Rep Email,43,Desktop,Marketing Cloud
+DIG00057,HCP0017,ACC003,CMP001,2025-10-23,Asset download,Paper Download,1,Desktop,Marketing Cloud
+DIG00058,HCP0044,ACC011,CMP009,2025-02-27,Webinar registration,Paper Download,69,Desktop,GA4
+DIG00059,HCP0031,ACC006,CMP001,2025-07-05,Webinar registration,Open,46,Mobile,Veeva
+DIG00060,HCP0047,ACC010,CMP003,2025-01-31,Email,Open,60,Mobile,Marketing Cloud
+DIG00061,HCP0017,ACC003,CMP001,2025-03-31,Web visit,Open,98,Mobile,Veeva
+DIG00062,HCP0025,ACC001,CMP002,2024-07-15,Asset download,Webinar Attend,92,Desktop,Marketing Cloud
+DIG00063,HCP0035,ACC003,CMP006,2025-05-20,Email,Webinar Attend,64,Tablet,Marketing Cloud
+DIG00064,HCP0012,ACC007,CMP004,2024-01-08,Webinar registration,Open,36,Tablet,Webinar platform
+DIG00065,HCP0031,ACC006,CMP009,2024-06-23,Web visit,Rep Email,87,Tablet,Marketing Cloud
+DIG00066,HCP0040,ACC005,CMP010,2024-03-07,Web visit,Open,17,Mobile,Marketing Cloud
+DIG00067,HCP0013,ACC007,CMP012,2025-06-19,Banner,Click,87,Desktop,Veeva
+DIG00068,HCP0018,ACC001,CMP009,2025-11-28,Webinar registration,Open,55,Tablet,GA4
+DIG00069,HCP0014,ACC012,CMP007,2024-11-26,Webinar registration,Webinar Attend,16,Tablet,Webinar platform
+DIG00070,HCP0041,ACC002,CMP006,2025-05-22,Asset download,Open,93,Desktop,GA4
+DIG00071,HCP0038,ACC005,CMP007,2024-10-11,Asset download,Paper Download,41,Desktop,Webinar platform
+DIG00072,HCP0001,ACC012,CMP006,2024-07-18,Email,Rep Email,4,Tablet,Marketing Cloud
+DIG00073,HCP0044,ACC011,CMP007,2025-12-07,Email,Click,26,Desktop,Veeva
+DIG00074,HCP0004,ACC008,CMP002,2024-11-14,Email,Open,62,Mobile,GA4
+DIG00075,HCP0010,ACC009,CMP011,2025-08-29,Banner,Webinar Attend,32,Desktop,Webinar platform
+DIG00076,HCP0013,ACC007,CMP006,2024-09-01,Email,Webinar Attend,67,Desktop,GA4
+DIG00077,HCP0045,ACC009,CMP010,2025-09-06,Webinar registration,Open,81,Mobile,GA4
+DIG00078,HCP0018,ACC001,CMP001,2024-03-28,Email,Paper Download,41,Tablet,GA4
+DIG00079,HCP0006,ACC010,CMP001,2024-05-10,Webinar registration,Open,39,Tablet,Webinar platform
+DIG00080,HCP0038,ACC005,CMP002,2024-03-08,Email,Rep Email,7,Mobile,Webinar platform

@@ -1,0 +1,42 @@
+relationship_id,kol_id_1,kol_id_2,hcp_id_1,hcp_id_2,relationship_type,shared_topic,edge_weight,evidence_source,since_date,source_system
+KREL00001,KOL0001,KOL0005,HCP0003,HCP0012,conference_panel,Biomarkers,0.303,Conference abstract,2022-06-19,Synthetic KOL Network
+KREL00002,KOL0001,KOL0006,HCP0003,HCP0027,coauthored,Access,0.438,Speaker bureau,2022-12-10,Synthetic KOL Network
+KREL00003,KOL0001,KOL0007,HCP0003,HCP0030,conference_panel,Safety,0.476,Speaker bureau,2023-09-19,Synthetic KOL Network
+KREL00004,KOL0001,KOL0009,HCP0003,HCP0038,trial_collaboration,Safety,0.469,Speaker bureau,2023-01-30,Synthetic KOL Network
+KREL00005,KOL0001,KOL0010,HCP0003,HCP0045,trial_collaboration,Safety,0.569,PubMed,2023-02-07,Synthetic KOL Network
+KREL00006,KOL0001,KOL0014,HCP0003,HCP0037,institution_overlap,Safety,0.536,PubMed,2022-01-27,Synthetic KOL Network
+KREL00007,KOL0001,KOL0015,HCP0003,HCP0041,trial_collaboration,Safety,0.533,Conference abstract,2024-06-04,Synthetic KOL Network
+KREL00008,KOL0001,KOL0018,HCP0003,HCP0023,coauthored,Safety,0.746,PubMed,2024-07-05,Synthetic KOL Network
+KREL00009,KOL0002,KOL0003,HCP0005,HCP0025,trial_collaboration,Patient Selection,0.619,Institution directory,2022-11-20,Synthetic KOL Network
+KREL00010,KOL0002,KOL0005,HCP0005,HCP0012,same_guideline_committee,Safety,0.432,Conference abstract,2023-10-06,Synthetic KOL Network
+KREL00011,KOL0002,KOL0008,HCP0005,HCP0034,coauthored,Efficacy,0.523,Conference abstract,2023-09-07,Synthetic KOL Network
+KREL00012,KOL0002,KOL0012,HCP0005,HCP0011,conference_panel,Efficacy,0.571,PubMed,2025-03-28,Synthetic KOL Network
+KREL00013,KOL0002,KOL0014,HCP0005,HCP0037,conference_panel,Access,0.437,Conference abstract,2024-05-26,Synthetic KOL Network
+KREL00014,KOL0003,KOL0007,HCP0025,HCP0030,institution_overlap,Patient Selection,0.573,Institution directory,2025-03-17,Synthetic KOL Network
+KREL00015,KOL0003,KOL0010,HCP0025,HCP0045,institution_overlap,Patient Selection,0.718,Conference abstract,2024-05-07,Synthetic KOL Network
+KREL00016,KOL0004,KOL0010,HCP0008,HCP0045,trial_collaboration,Access,0.519,Conference abstract,2025-02-17,Synthetic KOL Network
+KREL00017,KOL0004,KOL0012,HCP0008,HCP0011,conference_panel,Safety,0.321,Institution directory,2022-09-29,Synthetic KOL Network
+KREL00018,KOL0004,KOL0016,HCP0008,HCP0001,trial_collaboration,Real-World Evidence,0.663,PubMed,2023-09-16,Synthetic KOL Network
+KREL00019,KOL0004,KOL0018,HCP0008,HCP0023,institution_overlap,Access,0.376,PubMed,2025-01-18,Synthetic KOL Network
+KREL00020,KOL0005,KOL0007,HCP0012,HCP0030,same_guideline_committee,Efficacy,0.143,Conference abstract,2022-11-25,Synthetic KOL Network
+KREL00021,KOL0005,KOL0008,HCP0012,HCP0034,conference_panel,Biomarkers,0.476,Conference abstract,2024-12-30,Synthetic KOL Network
+KREL00022,KOL0005,KOL0012,HCP0012,HCP0011,conference_panel,Access,0.242,PubMed,2022-12-16,Synthetic KOL Network
+KREL00023,KOL0006,KOL0015,HCP0027,HCP0041,trial_collaboration,Biomarkers,0.411,Institution directory,2022-02-13,Synthetic KOL Network
+KREL00024,KOL0006,KOL0017,HCP0027,HCP0020,coauthored,Access,0.319,Institution directory,2024-08-21,Synthetic KOL Network
+KREL00025,KOL0007,KOL0008,HCP0030,HCP0034,trial_collaboration,Biomarkers,0.427,Conference abstract,2024-10-19,Synthetic KOL Network
+KREL00026,KOL0007,KOL0010,HCP0030,HCP0045,coauthored,Patient Selection,0.689,Institution directory,2023-05-26,Synthetic KOL Network
+KREL00027,KOL0008,KOL0010,HCP0034,HCP0045,trial_collaboration,Safety,0.317,Speaker bureau,2023-05-12,Synthetic KOL Network
+KREL00028,KOL0008,KOL0017,HCP0034,HCP0020,same_guideline_committee,Access,0.482,PubMed,2024-09-08,Synthetic KOL Network
+KREL00029,KOL0009,KOL0012,HCP0038,HCP0011,conference_panel,Access,0.294,Conference abstract,2022-03-12,Synthetic KOL Network
+KREL00030,KOL0009,KOL0015,HCP0038,HCP0041,institution_overlap,Safety,0.622,Speaker bureau,2022-03-25,Synthetic KOL Network
+KREL00031,KOL0009,KOL0016,HCP0038,HCP0001,trial_collaboration,Safety,0.407,Institution directory,2022-11-07,Synthetic KOL Network
+KREL00032,KOL0009,KOL0017,HCP0038,HCP0020,coauthored,Safety,0.533,Conference abstract,2024-05-11,Synthetic KOL Network
+KREL00033,KOL0009,KOL0018,HCP0038,HCP0023,institution_overlap,Safety,0.517,PubMed,2024-05-15,Synthetic KOL Network
+KREL00034,KOL0010,KOL0015,HCP0045,HCP0041,same_guideline_committee,Biomarkers,0.175,PubMed,2024-02-25,Synthetic KOL Network
+KREL00035,KOL0011,KOL0013,HCP0046,HCP0019,same_guideline_committee,Real-World Evidence,0.67,Institution directory,2022-10-31,Synthetic KOL Network
+KREL00036,KOL0011,KOL0015,HCP0046,HCP0041,institution_overlap,Efficacy,0.335,PubMed,2023-02-11,Synthetic KOL Network
+KREL00037,KOL0011,KOL0017,HCP0046,HCP0020,trial_collaboration,Biomarkers,0.171,Conference abstract,2024-11-17,Synthetic KOL Network
+KREL00038,KOL0011,KOL0018,HCP0046,HCP0023,same_guideline_committee,Safety,0.621,Institution directory,2023-10-07,Synthetic KOL Network
+KREL00039,KOL0012,KOL0014,HCP0011,HCP0037,institution_overlap,Safety,0.384,Speaker bureau,2023-04-09,Synthetic KOL Network
+KREL00040,KOL0015,KOL0016,HCP0041,HCP0001,trial_collaboration,Safety,0.475,Speaker bureau,2025-03-30,Synthetic KOL Network
+KREL00041,KOL0015,KOL0017,HCP0041,HCP0020,coauthored,Safety,0.526,PubMed,2022-02-06,Synthetic KOL Network
