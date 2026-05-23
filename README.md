@@ -60,6 +60,7 @@ This repo is wired to run on Emergent's managed cluster (supervisor + Mongo). Fo
 cd backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+pip install emergentintegrations --extra-index-url https://d33sy5i8bnduwe.cloudfront.net/simple/
 cp .env.example .env  # or use the provided .env
 uvicorn server:app --host 0.0.0.0 --port 8001 --reload
 ```
