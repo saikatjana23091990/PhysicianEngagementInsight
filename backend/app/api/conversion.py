@@ -2,26 +2,34 @@ from typing import Optional
 from fastapi import APIRouter, Query, HTTPException
 import json
 
+import pandas as pd
+
 from app.services.conversion_engine import ConversionEngine
 from app.data.store import DataStore
+from app.utils.filters import filter_calls
 
 router = APIRouter(prefix="/conversion", tags=["conversion"])
 
 
-@router.get("/overview")
-def overview(territory: Optional[str] = None, rep_id: Optional[str] = None, product_id: Optional[str] = None):
+def _filtered_enriched(specialty: Optional[str], territory: Optional[str],
+                       region: Optional[str], time_window_days: Optional[int]) -> pd.DataFrame:
     eng = ConversionEngine()
-    filters = {k: v for k, v in {"territory": territory, "rep_id": rep_id, "product_id": product_id}.items() if v}
-    # Note: territory filter requires joining with hcp; do it via enrichment then re-filter
-    calls = eng._build_linked_calls() if filters else eng.calls()
-    if filters:
-        enriched = eng._enrich(calls)
-        for k, v in filters.items():
-            if k in enriched.columns:
-                enriched = enriched[enriched[k] == v]
-        calls = enriched
-    total = len(calls)
-    conv = int(calls["converted"].sum()) if total else 0
+    enriched = eng._enrich(eng.calls())
+    return filter_calls(enriched, specialty=specialty, territory=territory,
+                        region=region, time_window_days=time_window_days)
+
+
+@router.get("/overview")
+def overview(specialty: Optional[str] = None, territory: Optional[str] = None,
+             region: Optional[str] = None, time_window_days: Optional[int] = None,
+             rep_id: Optional[str] = None, product_id: Optional[str] = None):
+    df = _filtered_enriched(specialty, territory, region, time_window_days)
+    if rep_id and "rep_id" in df.columns:
+        df = df[df["rep_id"] == rep_id]
+    if product_id and "product_id" in df.columns:
+        df = df[df["product_id"] == product_id]
+    total = len(df)
+    conv = int(df["converted"].sum()) if total else 0
     rate = round(100.0 * conv / total, 2) if total else 0.0
     return {
         "total_calls": total,
@@ -33,13 +41,24 @@ def overview(territory: Optional[str] = None, rep_id: Optional[str] = None, prod
 
 
 @router.get("/trend")
-def trend(freq: str = "W"):
-    eng = ConversionEngine()
-    df = eng.trend(freq=freq)
+def trend(freq: str = "W", specialty: Optional[str] = None, territory: Optional[str] = None,
+          region: Optional[str] = None, time_window_days: Optional[int] = None):
+    df = _filtered_enriched(specialty, territory, region, time_window_days)
     if df.empty:
         return []
+    df = df.copy()
+    df["bucket"] = df["interaction_datetime"].dt.to_period(
+        "D" if freq == "D" else "W" if freq == "W" else "M"
+    ).dt.to_timestamp()
+    agg = df.groupby("bucket").agg(
+        total_calls=("interaction_id", "count"),
+        converted_calls=("converted", "sum"),
+    ).reset_index()
+    agg["conversion_rate"] = (100.0 * agg["converted_calls"] / agg["total_calls"]).round(2)
+    agg["rolling_7d"] = agg["conversion_rate"].rolling(7, min_periods=1).mean().round(2)
+    agg["rolling_30d"] = agg["conversion_rate"].rolling(30, min_periods=1).mean().round(2)
     out = []
-    for _, r in df.iterrows():
+    for _, r in agg.iterrows():
         out.append({
             "bucket": r["bucket"].isoformat(),
             "total_calls": int(r["total_calls"]),
@@ -52,24 +71,28 @@ def trend(freq: str = "W"):
 
 
 @router.get("/breakdown/{dim}")
-def breakdown(dim: str):
-    eng = ConversionEngine()
-    df = eng.breakdown(dim)
-    if df.empty:
+def breakdown(dim: str, specialty: Optional[str] = None, territory: Optional[str] = None,
+              region: Optional[str] = None, time_window_days: Optional[int] = None):
+    df = _filtered_enriched(specialty, territory, region, time_window_days)
+    if df.empty or dim not in df.columns:
         return []
-    df = df.copy()
-    # convert nan
-    return json.loads(df.to_json(orient="records"))
+    grp = df.groupby(dim).agg(
+        total_calls=("interaction_id", "count"),
+        converted_calls=("converted", "sum"),
+    ).reset_index()
+    grp["conversion_rate"] = (100.0 * grp["converted_calls"] / grp["total_calls"]).round(2)
+    grp = grp.sort_values("conversion_rate", ascending=False)
+    return json.loads(grp.to_json(orient="records"))
 
 
 @router.get("/heatmap")
-def heatmap():
+def heatmap(specialty: Optional[str] = None, territory: Optional[str] = None,
+            region: Optional[str] = None, time_window_days: Optional[int] = None):
     """Rep vs Therapy heatmap."""
-    eng = ConversionEngine()
-    calls = eng._enrich(eng.calls())
-    if calls.empty:
+    df = _filtered_enriched(specialty, territory, region, time_window_days)
+    if df.empty:
         return {"rows": [], "columns": [], "matrix": []}
-    pivot = calls.pivot_table(
+    pivot = df.pivot_table(
         index="rep_name", columns="specialty_group",
         values="converted", aggfunc=lambda s: round(100.0 * s.mean(), 1) if len(s) else 0.0,
         fill_value=0.0,
@@ -91,22 +114,29 @@ def audit(interaction_id: str):
 
 
 @router.get("/forecast")
-def forecast(weeks_ahead: int = 8):
+def forecast(weeks_ahead: int = 8, specialty: Optional[str] = None, territory: Optional[str] = None,
+             region: Optional[str] = None, time_window_days: Optional[int] = None):
     """Forecasts TWO series: total_calls/week and converted_calls/week.
     Returns each point's forecast values, CIs, derived rate, and the convergence
-    week (where forecasted converted_calls would approach total_calls — i.e. 100%
-    conversion would be implausible; we annotate the implied convergence-of-trends
-    week as where rate >= 50%, plus distance-closing week)."""
-    import pandas as pd
+    week (where the gap between the two forecasted lines is smallest)."""
     from app.ml.forecast import forecast_holt_winters
-    eng = ConversionEngine()
-    df = eng.trend(freq="W")
-    if df.empty:
+    df_calls = _filtered_enriched(specialty, territory, region, time_window_days)
+    if df_calls.empty:
         return {"history": [], "forecast": [], "convergence": None}
 
-    last = df["bucket"].iloc[-1]
-    total_series = pd.Series(df["total_calls"].astype(float).values, index=df["bucket"])
-    conv_series = pd.Series(df["converted_calls"].astype(float).values, index=df["bucket"])
+    df_calls = df_calls.copy()
+    df_calls["bucket"] = df_calls["interaction_datetime"].dt.to_period("W").dt.to_timestamp()
+    agg = df_calls.groupby("bucket").agg(
+        total_calls=("interaction_id", "count"),
+        converted_calls=("converted", "sum"),
+    ).reset_index()
+    if agg.empty:
+        return {"history": [], "forecast": [], "convergence": None}
+    agg["conversion_rate"] = (100.0 * agg["converted_calls"] / agg["total_calls"]).round(2)
+
+    last = agg["bucket"].iloc[-1]
+    total_series = pd.Series(agg["total_calls"].astype(float).values, index=agg["bucket"])
+    conv_series = pd.Series(agg["converted_calls"].astype(float).values, index=agg["bucket"])
     fc_total = forecast_holt_winters(total_series, steps=weeks_ahead)
     fc_conv = forecast_holt_winters(conv_series, steps=weeks_ahead)
 
@@ -117,7 +147,7 @@ def forecast(weeks_ahead: int = 8):
             "converted_calls": int(r["converted_calls"]),
             "conversion_rate": float(r["conversion_rate"]),
         }
-        for _, r in df.iterrows()
+        for _, r in agg.iterrows()
     ]
 
     forecast_points = []
@@ -126,7 +156,7 @@ def forecast(weeks_ahead: int = 8):
     for i, ((_, tr), (_, cr)) in enumerate(zip(fc_total.iterrows(), fc_conv.iterrows()), start=1):
         bucket = (last + pd.Timedelta(weeks=i)).isoformat()
         total_f = max(0.0, float(tr["forecast"]))
-        conv_f = max(0.0, min(float(cr["forecast"]), total_f))  # cannot exceed total
+        conv_f = max(0.0, min(float(cr["forecast"]), total_f))
         rate = round(100.0 * conv_f / total_f, 2) if total_f > 0 else 0.0
         gap = total_f - conv_f
         forecast_points.append({
@@ -144,8 +174,7 @@ def forecast(weeks_ahead: int = 8):
             convergence_gap_min = gap
             convergence_week = bucket
 
-    # convergence interpretation
-    last_hist = history[-1] if history else {"total_calls": 0, "converted_calls": 0}
+    last_hist = history[-1]
     last_gap = (last_hist["total_calls"] or 0) - (last_hist["converted_calls"] or 0)
     final_forecast = forecast_points[-1] if forecast_points else None
     direction = (

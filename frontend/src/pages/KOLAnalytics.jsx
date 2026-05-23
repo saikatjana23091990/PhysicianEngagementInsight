@@ -9,6 +9,7 @@ import SectionHeader from "../components/SectionHeader";
 import KPICard from "../components/KPICard";
 import LoadingState from "../components/LoadingState";
 import { palette, chartPalette } from "../theme/kiwiTheme";
+import FilterBar, { buildFilterParams, EMPTY_FILTERS } from "../components/FilterBar";
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell,
 } from "recharts";
@@ -17,14 +18,20 @@ export default function KOLAnalytics() {
   const [dash, setDash] = useState(null);
   const [topics, setTopics] = useState([]);
   const [network, setNetwork] = useState(null);
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
   const containerRef = useRef(null);
   const [size, setSize] = useState({ w: 600, h: 480 });
 
   useEffect(() => {
-    KOL.dashboard().then(setDash);
-    KOL.topics().then(setTopics);
-    KOL.network().then(setNetwork);
-  }, []);
+    const p = buildFilterParams(filters);
+    // KOL doesn't use territory/time_window; drop them for the API
+    delete p.territory;
+    delete p.time_window_days;
+    setDash(null);
+    KOL.dashboard(p).then(setDash);
+    KOL.topics(p).then(setTopics);
+    KOL.network(null, p).then(setNetwork);
+  }, [filters]);
 
   useEffect(() => {
     const update = () => {
@@ -49,7 +56,18 @@ export default function KOLAnalytics() {
     };
   }, [network]);
 
-  if (!dash) return <LoadingState label="Loading KOL analytics…" />;
+  if (!dash) return (
+    <Box>
+      <SectionHeader
+        eyebrow="Scientific Influence"
+        title="KOL Analytics & Network"
+        subtitle="Co-author networks, topic momentum, and rising-star KOLs feeding rep briefings and HCP targeting."
+      />
+      <FilterBar value={filters} onChange={setFilters} testidPrefix="kol-filter"
+        show={{ specialty: true, territory: false, region: true, time_window_days: false }} />
+      <LoadingState label="Loading KOL analytics…" />
+    </Box>
+  );
   const s = dash.summary;
 
   return (
@@ -59,6 +77,9 @@ export default function KOLAnalytics() {
         title="KOL Analytics & Network"
         subtitle="Co-author networks, topic momentum, and rising-star KOLs feeding rep briefings and HCP targeting."
       />
+
+      <FilterBar value={filters} onChange={setFilters} testidPrefix="kol-filter"
+        show={{ specialty: true, territory: false, region: true, time_window_days: false }} />
 
       <Grid container spacing={2.5} sx={{ mb: 2 }}>
         <Grid item xs={6} md={3}><KPICard label="Total KOLs" value={s.total_kols} accent={palette.primary} /></Grid>

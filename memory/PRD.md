@@ -39,6 +39,12 @@ Build a production-quality, demo-ready, enterprise-scalable commercial analytics
 - AWS Bedrock provider with bearer token + Emergent fallback
 - Kiwi-themed UI (#028174 / #0AB68B / #92DE8B / #FFE3B3)
 
+### Iteration 4 (2026-05-23)
+- **Shared FilterBar component** — extracted reusable `<FilterBar>` (specialty / territory / region / time-window) with `show` prop for per-page customization; `buildFilterParams()` helper and `EMPTY_FILTERS` constant
+- **Filters applied to Conversion Analytics** — `/api/conversion/{overview,trend,breakdown,heatmap,forecast}` all accept `specialty`, `territory`, `region`, `time_window_days`; the dual-line forecast respects the active filter (convergence direction recomputes per slice)
+- **Filters applied to KOL Analytics** — `/api/kol/{dashboard,list,topics,network}` accept `specialty` and `region` (territory & time-window hidden via `show` prop, as they don't apply to publication/influence data)
+- **Shared filter util** — backend `app/utils/filters.py` with `filter_calls()` + `filter_hcp_ids()` for future reuse
+
 ### Iteration 3 (2026-05-22)
 - **Interactive Executive Dashboard filters** — Specialty / Territory / Region / Time window dropdowns; `/api/exec/dashboard` accepts query params and recomputes KPIs, trend, breakdowns, and top opportunities; reset icon + active-filter chip count
 - **Dual-line forecast** — `/api/conversion/forecast` now forecasts both `total_calls` and `converted_calls` with Holt-Winters + confidence bands; convergence analysis (current gap, forecast min gap, direction = narrowing / widening / stable); new chart renders both lines with forecast region tint and reference line at min-gap week

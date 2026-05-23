@@ -14,11 +14,11 @@ export const KPI = {
 
 export const Conversion = {
   overview: (params) => api.get("/conversion/overview", { params }).then((r) => r.data),
-  trend: (freq = "W") => api.get("/conversion/trend", { params: { freq } }).then((r) => r.data),
-  breakdown: (dim) => api.get(`/conversion/breakdown/${dim}`).then((r) => r.data),
-  heatmap: () => api.get("/conversion/heatmap").then((r) => r.data),
+  trend: (freq = "W", params = {}) => api.get("/conversion/trend", { params: { freq, ...params } }).then((r) => r.data),
+  breakdown: (dim, params = {}) => api.get(`/conversion/breakdown/${dim}`, { params }).then((r) => r.data),
+  heatmap: (params = {}) => api.get("/conversion/heatmap", { params }).then((r) => r.data),
   audit: (id) => api.get(`/conversion/audit/${id}`).then((r) => r.data),
-  forecast: (weeks = 8) => api.get("/conversion/forecast", { params: { weeks_ahead: weeks } }).then((r) => r.data),
+  forecast: (weeks = 8, params = {}) => api.get("/conversion/forecast", { params: { weeks_ahead: weeks, ...params } }).then((r) => r.data),
 };
 
 export const HCPApi = {
@@ -41,10 +41,10 @@ export const Territory = {
 };
 
 export const KOL = {
-  dashboard: () => api.get("/kol/dashboard").then((r) => r.data),
+  dashboard: (params = {}) => api.get("/kol/dashboard", { params }).then((r) => r.data),
   list: (params) => api.get("/kol/list", { params }).then((r) => r.data),
-  network: (kol_id) => api.get("/kol/network", { params: kol_id ? { kol_id } : {} }).then((r) => r.data),
-  topics: () => api.get("/kol/topics").then((r) => r.data),
+  network: (kol_id, params = {}) => api.get("/kol/network", { params: { ...(kol_id ? { kol_id } : {}), ...params } }).then((r) => r.data),
+  topics: (params = {}) => api.get("/kol/topics", { params }).then((r) => r.data),
   detail: (id) => api.get(`/kol/${id}`).then((r) => r.data),
 };
 

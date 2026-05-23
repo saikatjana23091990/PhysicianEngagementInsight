@@ -11,6 +11,7 @@ import SectionHeader from "../components/SectionHeader";
 import KPICard from "../components/KPICard";
 import LoadingState from "../components/LoadingState";
 import { palette, chartPalette } from "../theme/kiwiTheme";
+import FilterBar, { buildFilterParams, EMPTY_FILTERS } from "../components/FilterBar";
 
 export default function ConversionAnalytics() {
   const [trend, setTrend] = useState([]);
@@ -20,17 +21,31 @@ export default function ConversionAnalytics() {
   const [byTherapy, setByTherapy] = useState([]);
   const [heat, setHeat] = useState(null);
   const [tab, setTab] = useState(0);
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
 
   useEffect(() => {
-    Conversion.overview().then(setOverview);
-    Conversion.trend("W").then(setTrend);
-    Conversion.forecast(8).then(setForecast);
-    Conversion.breakdown("rep_name").then(setByRep);
-    Conversion.breakdown("specialty_group").then(setByTherapy);
-    Conversion.heatmap().then(setHeat);
-  }, []);
+    const p = buildFilterParams(filters);
+    setOverview(null);
+    setForecast(null);
+    Conversion.overview(p).then(setOverview);
+    Conversion.trend("W", p).then(setTrend);
+    Conversion.forecast(8, p).then(setForecast);
+    Conversion.breakdown("rep_name", p).then(setByRep);
+    Conversion.breakdown("specialty_group", p).then(setByTherapy);
+    Conversion.heatmap(p).then(setHeat);
+  }, [filters]);
 
-  if (!overview || !trend.length || !forecast) return <LoadingState label="Loading conversion analytics…" />;
+  if (!overview || !forecast) return (
+    <Box>
+      <SectionHeader
+        eyebrow="ConversionRate_30d Engine"
+        title="Conversion Analytics"
+        subtitle="Real-time rolling 30-day conversion attribution with breakdowns, heatmap, and forward-looking forecast."
+      />
+      <FilterBar value={filters} onChange={setFilters} testidPrefix="conv-filter" />
+      <LoadingState label="Loading conversion analytics…" />
+    </Box>
+  );
 
   // Build combined volume chart (history + forecast for total_calls vs converted_calls)
   const volumeData = [
@@ -57,6 +72,8 @@ export default function ConversionAnalytics() {
         title="Conversion Analytics"
         subtitle="Real-time rolling 30-day conversion attribution with breakdowns, heatmap, and forward-looking forecast."
       />
+
+      <FilterBar value={filters} onChange={setFilters} testidPrefix="conv-filter" />
 
       <Grid container spacing={2.5} sx={{ mb: 2 }}>
         <Grid item xs={12} sm={6} md={3}>
