@@ -29,13 +29,13 @@ from app.ai.llm import llm_service
 router = APIRouter(prefix="/export", tags=["export"])
 
 # Kiwi palette
-KIWI_PRIMARY = colors.HexColor("#028174")
-KIWI_ACCENT = colors.HexColor("#0AB68B")
-KIWI_LIGHT = colors.HexColor("#92DE8B")
-KIWI_CREAM = colors.HexColor("#FFE3B3")
-KIWI_DARK = colors.HexColor("#02403A")
-KIWI_MUTED = colors.HexColor("#5C746F")
-KIWI_BG = colors.HexColor("#F0F5F2")
+KIWI_PRIMARY = colors.HexColor("#534666")
+KIWI_ACCENT = colors.HexColor("#138086")
+KIWI_LIGHT = colors.HexColor("#DC8665")
+KIWI_CREAM = colors.HexColor("#EEB462")
+KIWI_DARK = colors.HexColor("#352B44")
+KIWI_MUTED = colors.HexColor("#6F6382")
+KIWI_BG = colors.HexColor("#F5ECE8")
 
 
 class ExportRequest(BaseModel):
@@ -184,8 +184,8 @@ async def export_pdf(req: ExportRequest):
         buf, pagesize=letter,
         leftMargin=0.6 * inch, rightMargin=0.6 * inch,
         topMargin=0.55 * inch, bottomMargin=0.55 * inch,
-        title="Commercial Analytics — Executive Brief",
-        author="Kiwi · Commercial Intelligence",
+        title="Physical Engagement — Executive Brief",
+        author="Vyntrix Intelligence",
     )
     st = _styles()
     story = []
