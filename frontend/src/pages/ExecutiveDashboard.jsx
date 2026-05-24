@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
   Grid, Card, CardContent, Typography, Box, Stack, Chip, Button, Divider, Paper,
-  Table, TableHead, TableRow, TableCell, TableBody, LinearProgress,
+  Table, TableHead, TableRow, TableCell, TableBody, LinearProgress, Dialog, DialogContent, DialogTitle, IconButton,
 } from "@mui/material";
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
 import PictureAsPdfRoundedIcon from "@mui/icons-material/PictureAsPdfRounded";
+import CloseIcon from "@mui/icons-material/Close";
+import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import ReactMarkdown from "react-markdown";
 import {
   AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, BarChart, Bar, CartesianGrid, Legend, Cell,
@@ -22,6 +24,7 @@ export default function ExecutiveDashboard() {
   const [narrLoading, setNarrLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
+  const [narrativeModalOpen, setNarrativeModalOpen] = useState(false);
 
   useEffect(() => {
     setData(null);
@@ -180,37 +183,87 @@ export default function ExecutiveDashboard() {
         </Grid>
 
         <Grid item xs={12} lg={4}>
-          <Card sx={{ height: "100%" }} data-testid="ai-narrative-card">
-            <CardContent>
-              <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                <AutoAwesomeRoundedIcon sx={{ color: palette.accent }} />
-                <Typography variant="h6" sx={{ fontFamily: "Sora" }}>
-                  AI Executive Narrative
-                </Typography>
+          <Card sx={{ height: "100%", maxHeight: 420, display: "flex", flexDirection: "column" }} data-testid="ai-narrative-card">
+            <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden", p: 2 }}>
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1, flexShrink: 0, justifyContent: "space-between" }}>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <AutoAwesomeRoundedIcon sx={{ color: palette.accent }} />
+                  <Typography variant="h6" sx={{ fontFamily: "Sora" }}>
+                    AI Executive Narrative
+                  </Typography>
+                </Stack>
+                {narrative && (
+                  <IconButton
+                    size="small"
+                    onClick={() => setNarrativeModalOpen(true)}
+                    sx={{ color: palette.accent }}
+                    title="Expand"
+                  >
+                    <OpenInFullIcon />
+                  </IconButton>
+                )}
               </Stack>
-              {narrLoading && <LinearProgress sx={{ mb: 1, borderRadius: 2 }} />}
-              {!narrative && (
-                <Typography variant="body2" sx={{ color: palette.textMuted }}>
-                  Click "Generate AI Narrative" to produce a grounded, source-cited commentary
-                  explaining KPI movement, leaders, laggards, and 30-day actions.
-                </Typography>
-              )}
-              {narrative && (
-                <>
-                  <Box sx={{ "& p": { mt: 1.2, mb: 0 }, "& h2": { fontFamily: "Sora", fontSize: 16, mt: 2 } }}>
-                    <ReactMarkdown>{narrative.narrative_markdown}</ReactMarkdown>
-                  </Box>
-                  <Divider sx={{ my: 1.5 }} />
-                  <Stack direction="row" spacing={1} flexWrap="wrap">
-                    <Chip size="small" label={`Provider: ${narrative.provider}`} sx={{ bgcolor: palette.surfaceAlt }} />
-                    <Chip size="small" label={`${narrative.latency_ms} ms`} sx={{ bgcolor: palette.surfaceAlt }} />
-                    {narrative.fallback_used && <Chip size="small" label="fallback" color="warning" />}
-                  </Stack>
-                </>
-              )}
+              {narrLoading && <LinearProgress sx={{ mb: 1, borderRadius: 2, flexShrink: 0 }} />}
+              <Box sx={{ overflowY: "auto", flexGrow: 1, minHeight: 0 }}>
+                {!narrative && (
+                  <Typography variant="body2" sx={{ color: palette.textMuted }}>
+                    Click "Generate AI Narrative" to produce a grounded, source-cited commentary
+                    explaining KPI movement, leaders, laggards, and 30-day actions.
+                  </Typography>
+                )}
+                {narrative && (
+                  <>
+                    <Box sx={{ "& p": { mt: 1.2, mb: 0 }, "& h2": { fontFamily: "Sora", fontSize: 16, mt: 2 } }}>
+                      <ReactMarkdown>{narrative.narrative_markdown}</ReactMarkdown>
+                    </Box>
+                    <Divider sx={{ my: 1.5 }} />
+                    <Stack direction="row" spacing={1} flexWrap="wrap">
+                      <Chip size="small" label={`Provider: ${narrative.provider}`} sx={{ bgcolor: palette.surfaceAlt }} />
+                      <Chip size="small" label={`${narrative.latency_ms} ms`} sx={{ bgcolor: palette.surfaceAlt }} />
+                      {narrative.fallback_used && <Chip size="small" label="fallback" color="warning" />}
+                    </Stack>
+                  </>
+                )}
+              </Box>
             </CardContent>
           </Card>
         </Grid>
+
+        <Dialog
+          open={narrativeModalOpen}
+          onClose={() => setNarrativeModalOpen(false)}
+          maxWidth="lg"
+          fullWidth
+          PaperProps={{
+            sx: { maxHeight: "80vh" }
+          }}
+        >
+          <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontFamily: "Sora" }}>
+            AI Executive Narrative
+            <IconButton
+              onClick={() => setNarrativeModalOpen(false)}
+              size="small"
+              sx={{ color: palette.textMuted }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent dividers sx={{ overflowY: "auto" }}>
+            {narrative && (
+              <>
+                <Box sx={{ "& p": { mt: 1.2, mb: 0 }, "& h2": { fontFamily: "Sora", fontSize: 16, mt: 2 } }}>
+                  <ReactMarkdown>{narrative.narrative_markdown}</ReactMarkdown>
+                </Box>
+                <Divider sx={{ my: 2 }} />
+                <Stack direction="row" spacing={1} flexWrap="wrap">
+                  <Chip size="small" label={`Provider: ${narrative.provider}`} sx={{ bgcolor: palette.surfaceAlt }} />
+                  <Chip size="small" label={`${narrative.latency_ms} ms`} sx={{ bgcolor: palette.surfaceAlt }} />
+                  {narrative.fallback_used && <Chip size="small" label="fallback" color="warning" />}
+                </Stack>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
 
         <Grid item xs={12} md={6}>
           <Card>

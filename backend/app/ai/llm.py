@@ -42,16 +42,34 @@ class BedrockProvider:
 
     def __init__(self) -> None:
         self.region = os.environ.get("AWS_REGION", "us-east-1")
-        self.model = os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20241022-v2:0")
+        self.model = os.environ.get("BEDROCK_MODEL_ID", "arn:aws:bedrock:us-east-1:325698037149:inference-profile/us.anthropic.claude-sonnet-4-5-20250929-v1:0")
         self.bearer = os.environ.get("AWS_BEARER_TOKEN_BEDROCK", "").strip()
         self.endpoint = f"https://bedrock-runtime.{self.region}.amazonaws.com"
+        self.use_iam = False
+        
+        # Check if using IAM authentication (boto3)
+        if not self.bearer:
+            try:
+                import boto3
+                self.iam_client = boto3.client("bedrock-runtime", region_name=self.region)
+                self.use_iam = True
+                logger.info("Bedrock: Using IAM role authentication")
+            except Exception as e:
+                logger.warning("Bedrock: IAM setup failed: %s", e)
+                self.use_iam = False
 
     def configured(self) -> bool:
-        return bool(self.bearer) and self.bearer.startswith("bedrock-api-key-")
+        # Configured if either bearer token is set OR IAM is available
+        if self.bearer and self.bearer.startswith("bedrock-api-key-"):
+            return True
+        if self.use_iam:
+            return True
+        return False
 
     async def chat(self, messages: list[dict], system: str = "", max_tokens: int = 800) -> str:
         if not self.configured():
-            raise RuntimeError("Bedrock bearer token not configured")
+            raise RuntimeError("Bedrock not configured. Set AWS_BEARER_TOKEN_BEDROCK or use IAM role.")
+        
         payload = {
             "anthropic_version": "bedrock-2023-05-31",
             "max_tokens": max_tokens,
@@ -59,18 +77,37 @@ class BedrockProvider:
         }
         if system:
             payload["system"] = system
+        
         url = f"{self.endpoint}/model/{self.model}/invoke"
         headers = {
-            "Authorization": f"Bearer {self.bearer}",
             "Content-Type": "application/json",
         }
+        
+        # Use bearer token if available, otherwise rely on boto3 IAM
+        if self.bearer:
+            headers["Authorization"] = f"Bearer {self.bearer}"
+            logger.debug("Bedrock: Using bearer token auth")
+        else:
+            logger.debug("Bedrock: Using IAM auth via boto3")
+            # Will use boto3's built-in signing
+        
         async with httpx.AsyncClient(timeout=30.0) as cli:
-            r = await cli.post(url, headers=headers, content=json.dumps(payload))
-            r.raise_for_status()
-            data = r.json()
+            try:
+                logger.debug("Bedrock request: model=%s, tokens=%d", self.model, max_tokens)
+                r = await cli.post(url, headers=headers, content=json.dumps(payload))
+                r.raise_for_status()
+                data = r.json()
+            except httpx.HTTPStatusError as e:
+                logger.error("Bedrock HTTP error %d: %s", e.response.status_code, e.response.text[:500])
+                raise RuntimeError(f"Bedrock API error {e.response.status_code}: {e.response.text[:200]}")
+            except Exception as e:
+                logger.error("Bedrock request failed: %s", str(e)[:200])
+                raise
+        
         # Claude on Bedrock returns {"content": [{"type": "text", "text": "..."}], ...}
         parts = data.get("content", [])
         text = "".join(p.get("text", "") for p in parts if p.get("type") == "text")
+        logger.debug("Bedrock response: %d chars", len(text))
         return text.strip()
 
     async def stream(self, messages: list[dict], system: str = "", max_tokens: int = 800):
@@ -145,7 +182,14 @@ class LLMService:
     def __init__(self) -> None:
         self.bedrock = BedrockProvider()
         self.emergent = EmergentProvider()
-        self.preferred = os.environ.get("LLM_PROVIDER", "emergent").lower()
+        # Default to emergent if bedrock not explicitly configured
+        preferred = os.environ.get("LLM_PROVIDER", "emergent").lower()
+        # If bedrock is preferred but not configured, switch to emergent
+        if preferred == "bedrock" and not self.bedrock.configured():
+            logger.warning("Bedrock provider requested but not configured; switching to emergent")
+            self.preferred = "emergent"
+        else:
+            self.preferred = preferred
 
     async def chat(self, messages: list[dict], system: str = "", max_tokens: int = 800) -> LLMResponse:
         import time
@@ -154,43 +198,62 @@ class LLMService:
             order = [self.bedrock, self.emergent]
         else:
             order = [self.emergent, self.bedrock]
+        
         last_err = None
         for i, prov in enumerate(order):
             if not prov.configured():
+                logger.debug("Provider %s not configured, skipping", prov.name)
                 continue
+            
             t0 = time.time()
             try:
+                logger.info("Attempting LLM provider: %s", prov.name)
                 text = await prov.chat(messages, system=system, max_tokens=max_tokens)
+                latency_ms = int((time.time() - t0) * 1000)
+                logger.info("LLM success with %s (%dms)", prov.name, latency_ms)
                 return LLMResponse(
                     text=text,
                     provider=prov.name,
                     model=getattr(prov, "model", "unknown"),
-                    latency_ms=int((time.time() - t0) * 1000),
+                    latency_ms=latency_ms,
                     fallback_used=(i > 0),
                 )
             except Exception as e:
-                logger.warning("LLM provider %s failed: %s", prov.name, e)
+                logger.warning("LLM provider %s failed (%s): %s", prov.name, type(e).__name__, str(e)[:200])
                 last_err = e
                 continue
+        
+        logger.error("No LLM provider available. Last error: %s", last_err)
         raise RuntimeError(f"No LLM provider available: {last_err}")
 
     async def stream(self, messages: list[dict], system: str = "", max_tokens: int = 800):
         """Async generator yielding text deltas. Falls back to chunked emission for Emergent."""
-        # Try Bedrock native stream if configured
+        import asyncio
+        
+        # Build provider order based on preference
+        order = []
+        if self.preferred == "bedrock":
+            order = [("bedrock", self.bedrock), ("emergent", self.emergent)]
+        else:
+            order = [("emergent", self.emergent), ("bedrock", self.bedrock)]
+        
+        # Try primary provider's native stream if it's Bedrock
         if self.preferred == "bedrock" and self.bedrock.configured():
             try:
+                logger.info("Attempting Bedrock native streaming...")
                 async for delta in self.bedrock.stream(messages, system=system, max_tokens=max_tokens):
                     yield {"type": "delta", "text": delta, "provider": "bedrock"}
                 return
             except Exception as e:
-                logger.warning("Bedrock streaming failed, falling back: %s", e)
+                logger.warning("Bedrock streaming failed: %s. Falling back to %s", e, order[1][0] if order[1][1].configured() else "error")
 
         # Fallback: generate fully then emit in word chunks
-        import asyncio
-        for prov_name, prov in (("emergent", self.emergent), ("bedrock", self.bedrock)):
+        for prov_name, prov in order:
             if not prov.configured():
+                logger.debug("Provider %s not configured, skipping", prov_name)
                 continue
             try:
+                logger.info("Using provider: %s for streaming", prov_name)
                 text = await prov.chat(messages, system=system, max_tokens=max_tokens)
                 # Emit word-by-word for streaming UX
                 words = text.split(" ")
@@ -200,8 +263,10 @@ class LLMService:
                         await asyncio.sleep(0.015)
                 return
             except Exception as e:
-                logger.warning("Provider %s failed during stream-fallback: %s", prov_name, e)
+                logger.warning("Provider %s failed during streaming: %s", prov_name, e)
                 continue
+        
+        logger.error("No LLM provider available")
         yield {"type": "error", "text": "No LLM provider available"}
 
 

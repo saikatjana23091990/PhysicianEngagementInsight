@@ -1,31 +1,31 @@
 import { createTheme } from "@mui/material/styles";
 
-// Kiwi palette: 028174, 0AB68B, 92DE8B, FFE3B3
+// Palette based on the uploaded image: DC8665, 138086, 534666, CD7672, EEB462
 export const palette = {
-  primary: "#028174",
-  primaryDark: "#02403A",
-  accent: "#0AB68B",
-  light: "#92DE8B",
-  cream: "#FFE3B3",
-  bg: "#FAFBF8",
+  primary: "#534666",
+  primaryDark: "#352B44",
+  accent: "#138086",
+  light: "#DC8665",
+  cream: "#EEB462",
+  bg: "#FBF9F6",
   surface: "#FFFFFF",
-  surfaceAlt: "#F0F5F2",
-  text: "#0E2A26",
-  textMuted: "#5C746F",
-  border: "#E2EBE6",
-  danger: "#D04A4A",
-  warning: "#E3A24C",
+  surfaceAlt: "#F5ECE8",
+  text: "#2B2338",
+  textMuted: "#6F6382",
+  border: "#EFE6E2",
+  danger: "#CD7672",
+  warning: "#EEB462",
 };
 
 export const chartPalette = [
-  "#028174",
-  "#0AB68B",
-  "#92DE8B",
-  "#FFE3B3",
-  "#5DBFB0",
-  "#057F70",
-  "#C2EBC0",
-  "#F4C57A",
+  "#534666",
+  "#138086",
+  "#DC8665",
+  "#CD7672",
+  "#EEB462",
+  "#7C6C94",
+  "#1CA0A7",
+  "#F4AB94",
 ];
 
 export const kiwiTheme = createTheme({
@@ -65,7 +65,7 @@ export const kiwiTheme = createTheme({
       styleOverrides: {
         root: {
           border: `1px solid ${palette.border}`,
-          boxShadow: "0 2px 24px -12px rgba(2, 129, 116, 0.18)",
+          boxShadow: "0 2px 24px -12px rgba(83, 70, 102, 0.18)",
         },
       },
     },
@@ -80,7 +80,7 @@ export const kiwiTheme = createTheme({
         },
         containedPrimary: {
           background: `linear-gradient(135deg, ${palette.primary} 0%, ${palette.accent} 100%)`,
-          boxShadow: "0 6px 20px -10px rgba(2, 129, 116, 0.6)",
+          boxShadow: "0 6px 20px -10px rgba(83, 70, 102, 0.6)",
         },
       },
     },

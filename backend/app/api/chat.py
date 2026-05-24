@@ -34,18 +34,22 @@ async def ask_stream(req: AskRequest):
       event: delta  {text}
       event: done   {provider, model, latency_ms, audit_id}
     """
+    import logging
+    logger = logging.getLogger("chat.ask_stream")
     svc = AskDataService()
     payload = await svc.build_stream_payload(req.question, history=req.history)
 
     async def event_gen():
         import time
         import asyncio
+        logger.info("Starting stream for question: %s", req.question[:100])
         yield f"event: meta\ndata: {json.dumps({'retrieved': payload['retrieved']})}\n\n"
         full = []
         t0 = time.time()
         used_provider = None
         last_emit = time.time()
         try:
+            logger.debug("Invoking llm_service.stream with %d messages", len(payload["messages"]))
             async for chunk in llm_service.stream(messages=payload["messages"], system=payload["system"], max_tokens=1100):
                 if chunk.get("type") == "delta":
                     full.append(chunk["text"])
@@ -53,6 +57,7 @@ async def ask_stream(req: AskRequest):
                     yield f"event: delta\ndata: {json.dumps({'text': chunk['text']})}\n\n"
                     last_emit = time.time()
                 elif chunk.get("type") == "error":
+                    logger.error("LLM stream error: %s", chunk.get('text'))
                     yield f"event: error\ndata: {json.dumps({'message': chunk.get('text')})}\n\n"
                     return
                 # heartbeat if nothing emitted for 8s+
@@ -60,11 +65,13 @@ async def ask_stream(req: AskRequest):
                     yield ": keep-alive\n\n"
                     last_emit = time.time()
         except Exception as e:
+            logger.exception("Stream generation failed: %s", e)
             yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
             return
 
         full_text = "".join(full)
         latency_ms = int((time.time() - t0) * 1000)
+        logger.info("Stream completed with provider=%s, latency=%dms, text_len=%d", used_provider, latency_ms, len(full_text))
         audit_id = None
         try:
             audit_id = await log_ai_output(
@@ -73,8 +80,8 @@ async def ask_stream(req: AskRequest):
                 question=req.question, provider=used_provider, latency_ms=latency_ms,
                 citations=[s["source_id"] for s in payload["retrieved"]],
             )
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning("Audit logging failed: %s", e)
         yield f"event: done\ndata: {json.dumps({'provider': used_provider, 'latency_ms': latency_ms, 'audit_id': audit_id, 'sources': len(payload['retrieved'])})}\n\n"
 
     return StreamingResponse(

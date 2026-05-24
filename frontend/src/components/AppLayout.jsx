@@ -32,7 +32,7 @@ const NAV = [
   { to: "/kol", label: "KOL Analytics", icon: <HubRoundedIcon fontSize="small" />, roles: ["Manager", "Executive"] },
   { to: "/chat", label: "Ask Data", icon: <ChatRoundedIcon fontSize="small" />, roles: ["Rep", "Manager", "Executive"] },
   { to: "/sources", label: "Source Explorer", icon: <StorageRoundedIcon fontSize="small" />, roles: ["Manager", "Executive"] },
-  { to: "/settings", label: "Settings", icon: <SettingsRoundedIcon fontSize="small" />, roles: ["Executive"] },
+  // { to: "/settings", label: "Settings", icon: <SettingsRoundedIcon fontSize="small" />, roles: ["Executive"] },
 ];
 
 const ROLES = ["Executive", "Manager", "Rep"];
@@ -67,14 +67,14 @@ export default function AppLayout({ children }) {
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Box>
             <Typography variant="overline" sx={{ color: palette.textMuted }}>
-              Commercial Analytics Platform
+              Physician Engagement Insight Platform
             </Typography>
             <Typography variant="h6" sx={{ lineHeight: 1.1 }}>
               {currentTitle(location.pathname)}
             </Typography>
           </Box>
           <Stack direction="row" spacing={1.5} alignItems="center">
-            <Chip
+            {/* <Chip
               size="small"
               label="Bedrock + Emergent LLM"
               sx={{
@@ -84,7 +84,7 @@ export default function AppLayout({ children }) {
                 fontWeight: 600,
               }}
               data-testid="provider-chip"
-            />
+            /> */}
             <Tooltip title="Switch role">
               <Chip
                 onClick={(e) => setAnchor(e.currentTarget)}
@@ -144,14 +144,14 @@ export default function AppLayout({ children }) {
               boxShadow: "0 6px 18px -6px rgba(2,129,116,0.45)",
             }}
           >
-            K
+            VI
           </Box>
           <Box>
             <Typography variant="h6" sx={{ fontFamily: "Sora", fontWeight: 800, lineHeight: 1, fontSize: 17 }}>
-              Kiwi<span style={{ color: palette.accent }}>.</span>
+              Vyntrix Intelligence<span style={{ color: palette.accent }}>.</span>
             </Typography>
             <Typography variant="caption" sx={{ color: palette.textMuted }}>
-              Commercial Intelligence
+              Physician Insight
             </Typography>
           </Box>
         </Box>
@@ -195,7 +195,7 @@ export default function AppLayout({ children }) {
             );
           })}
         </List>
-        <Box sx={{ mt: "auto", p: 2 }}>
+        {/* <Box sx={{ mt: "auto", p: 2 }}>
           <Box
             sx={{
               borderRadius: 3,
@@ -214,7 +214,7 @@ export default function AppLayout({ children }) {
               All metrics computed at runtime.
             </Typography>
           </Box>
-        </Box>
+        </Box> */}
       </Drawer>
 
       <Box

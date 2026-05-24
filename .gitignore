@@ -3,7 +3,6 @@ __pycache__/
 *.pyc
 *.pyo
 .venv/
-.env
 *.egg-info/
 
 # Node
@@ -24,7 +23,6 @@ dist/
 .pytest_cache/
 *.local
 .env.*
-*.env
 credentials.json
 *.pem
 *.key
