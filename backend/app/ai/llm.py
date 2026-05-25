@@ -2,12 +2,10 @@
 LLM provider abstraction.
 
 Order of preference (configurable via LLM_PROVIDER env):
-- bedrock: AWS Bedrock with bearer token (AWS_BEARER_TOKEN_BEDROCK)
+- bedrock: AWS Bedrock with hybrid auth:
+  * Primary: boto3 with AWS SigV4 (when AWS_ACCESS_KEY_ID available)
+  * Fallback: Direct HTTP with bearer token (AWS_BEARER_TOKEN_BEDROCK)
 - emergent: Emergent LLM key + emergentintegrations (Claude Sonnet 4.5)
-
-The Bedrock provider supports both:
-1) Bearer-token short-term key (Authorization: Bearer bedrock-api-key-...)
-2) Standard sigv4 via boto3 if AWS_ACCESS_KEY_ID present.
 
 Both providers expose `chat(messages, system, max_tokens)` returning a string.
 
@@ -23,6 +21,7 @@ import uuid
 from dataclasses import dataclass
 from typing import Optional
 
+import boto3
 import httpx
 
 logger = logging.getLogger("ai.llm")
@@ -42,33 +41,41 @@ class BedrockProvider:
 
     def __init__(self) -> None:
         self.region = os.environ.get("AWS_REGION", "us-east-1")
-        self.model = os.environ.get("BEDROCK_MODEL_ID", "arn:aws:bedrock:us-east-1:325698037149:inference-profile/us.anthropic.claude-sonnet-4-5-20250929-v1:0")
+        self.model = os.environ.get("BEDROCK_MODEL_ID", "us.anthropic.claude-haiku-4-5-20251001-v1:0")
         self.bearer = os.environ.get("AWS_BEARER_TOKEN_BEDROCK", "").strip()
         self.endpoint = f"https://bedrock-runtime.{self.region}.amazonaws.com"
-        self.use_iam = False
         
-        # Check if using IAM authentication (boto3)
-        if not self.bearer:
-            try:
-                import boto3
-                self.iam_client = boto3.client("bedrock-runtime", region_name=self.region)
-                self.use_iam = True
-                logger.info("Bedrock: Using IAM role authentication")
-            except Exception as e:
-                logger.warning("Bedrock: IAM setup failed: %s", e)
-                self.use_iam = False
+        self.client = None
+        self.use_bearer = False
+        self.use_boto3 = False
+        
+        # Try boto3 first (production with AWS credentials)
+        try:
+            # Check if AWS credentials are available
+            creds = boto3.Session().get_credentials()
+            if creds:
+                self.client = boto3.client("bedrock-runtime", region_name=self.region)
+                self.use_boto3 = True
+                logger.info("Bedrock: Using boto3 + AWS SigV4 authentication (region=%s)", self.region)
+            else:
+                logger.debug("Bedrock: No AWS credentials found, will try bearer token")
+        except Exception as e:
+            logger.debug("Bedrock: boto3 initialization issue: %s", str(e)[:100])
+        
+        # Fallback to bearer token
+        if not self.use_boto3:
+            if self.bearer and self.bearer.startswith("bedrock-api-key-"):
+                self.use_bearer = True
+                logger.info("Bedrock: Using bearer token authentication")
+            else:
+                logger.warning("Bedrock: No valid authentication method found. Bearer token not configured or invalid.")
 
     def configured(self) -> bool:
-        # Configured if either bearer token is set OR IAM is available
-        if self.bearer and self.bearer.startswith("bedrock-api-key-"):
-            return True
-        if self.use_iam:
-            return True
-        return False
+        return self.use_boto3 or self.use_bearer
 
     async def chat(self, messages: list[dict], system: str = "", max_tokens: int = 800) -> str:
         if not self.configured():
-            raise RuntimeError("Bedrock not configured. Set AWS_BEARER_TOKEN_BEDROCK or use IAM role.")
+            raise RuntimeError("Bedrock not configured. Set AWS credentials or AWS_BEARER_TOKEN_BEDROCK env var.")
         
         payload = {
             "anthropic_version": "bedrock-2023-05-31",
@@ -78,42 +85,75 @@ class BedrockProvider:
         if system:
             payload["system"] = system
         
-        url = f"{self.endpoint}/model/{self.model}/invoke"
-        headers = {
-            "Content-Type": "application/json",
-        }
-        
-        # Use bearer token if available, otherwise rely on boto3 IAM
-        if self.bearer:
-            headers["Authorization"] = f"Bearer {self.bearer}"
-            logger.debug("Bedrock: Using bearer token auth")
+        if self.use_boto3:
+            return await self._chat_boto3(payload)
         else:
-            logger.debug("Bedrock: Using IAM auth via boto3")
-            # Will use boto3's built-in signing
-        
-        async with httpx.AsyncClient(timeout=30.0) as cli:
-            try:
-                logger.debug("Bedrock request: model=%s, tokens=%d", self.model, max_tokens)
+            return await self._chat_bearer(payload)
+
+    async def _chat_boto3(self, payload: dict) -> str:
+        """Call Bedrock using boto3 with AWS SigV4."""
+        try:
+            logger.debug("Bedrock: invoke_model with boto3, model=%s", self.model)
+            response = self.client.invoke_model(
+                modelId=self.model,
+                contentType="application/json",
+                body=json.dumps(payload),
+            )
+            
+            response_body = json.loads(response.get("body").read())
+            logger.debug("Bedrock: Response keys: %s", list(response_body.keys()))
+            
+            parts = response_body.get("content", [])
+            text = "".join(p.get("text", "") for p in parts if p.get("type") == "text")
+            
+            if not text:
+                logger.warning("Bedrock: Empty response content")
+            else:
+                logger.debug("Bedrock: Got %d chars", len(text))
+            
+            return text.strip()
+        except Exception as e:
+            logger.error("Bedrock: boto3 invoke_model failed: %s", str(e)[:300])
+            raise RuntimeError(f"Bedrock boto3 error: {str(e)[:100]}")
+
+    async def _chat_bearer(self, payload: dict) -> str:
+        """Call Bedrock using bearer token via httpx."""
+        try:
+            url = f"{self.endpoint}/model/{self.model}/invoke"
+            headers = {
+                "Authorization": f"Bearer {self.bearer}",
+                "Content-Type": "application/json",
+            }
+            
+            logger.debug("Bedrock: invoke via bearer token, model=%s", self.model)
+            async with httpx.AsyncClient(timeout=30.0) as cli:
                 r = await cli.post(url, headers=headers, content=json.dumps(payload))
                 r.raise_for_status()
                 data = r.json()
-            except httpx.HTTPStatusError as e:
-                logger.error("Bedrock HTTP error %d: %s", e.response.status_code, e.response.text[:500])
-                raise RuntimeError(f"Bedrock API error {e.response.status_code}: {e.response.text[:200]}")
-            except Exception as e:
-                logger.error("Bedrock request failed: %s", str(e)[:200])
-                raise
-        
-        # Claude on Bedrock returns {"content": [{"type": "text", "text": "..."}], ...}
-        parts = data.get("content", [])
-        text = "".join(p.get("text", "") for p in parts if p.get("type") == "text")
-        logger.debug("Bedrock response: %d chars", len(text))
-        return text.strip()
+            
+            logger.debug("Bedrock: Bearer response keys: %s", list(data.keys()))
+            
+            parts = data.get("content", [])
+            text = "".join(p.get("text", "") for p in parts if p.get("type") == "text")
+            
+            if not text:
+                logger.warning("Bedrock: Empty response content")
+            else:
+                logger.debug("Bedrock: Got %d chars", len(text))
+            
+            return text.strip()
+        except httpx.HTTPStatusError as e:
+            logger.error("Bedrock: Bearer token HTTP error %d: %s", e.response.status_code, e.response.text[:500])
+            raise RuntimeError(f"Bedrock API error {e.response.status_code}: {e.response.text[:200]}")
+        except Exception as e:
+            logger.error("Bedrock: Bearer token request failed: %s", str(e)[:300])
+            raise RuntimeError(f"Bedrock bearer error: {str(e)[:100]}")
 
     async def stream(self, messages: list[dict], system: str = "", max_tokens: int = 800):
-        """Native Bedrock streaming via InvokeModelWithResponseStream."""
+        """Native Bedrock streaming. Supports both boto3 and bearer token auth."""
         if not self.configured():
-            raise RuntimeError("Bedrock bearer token not configured")
+            raise RuntimeError("Bedrock not configured")
+        
         payload = {
             "anthropic_version": "bedrock-2023-05-31",
             "max_tokens": max_tokens,
@@ -121,32 +161,88 @@ class BedrockProvider:
         }
         if system:
             payload["system"] = system
-        url = f"{self.endpoint}/model/{self.model}/invoke-with-response-stream"
-        headers = {
-            "Authorization": f"Bearer {self.bearer}",
-            "Content-Type": "application/json",
-            "Accept": "application/vnd.amazon.eventstream",
-        }
-        async with httpx.AsyncClient(timeout=60.0) as cli:
-            async with cli.stream("POST", url, headers=headers, content=json.dumps(payload)) as r:
-                async for chunk in r.aiter_bytes():
-                    # Bedrock event-stream framing — extract any JSON delta heuristically
-                    try:
-                        text = chunk.decode("utf-8", errors="ignore")
-                        # Bedrock wraps payloads with binary framing; pull out {"bytes":"<base64>"} chunks
-                        import re, base64
-                        for m in re.finditer(r'\{"bytes":"([^"]+)"\}', text):
-                            try:
-                                decoded = base64.b64decode(m.group(1)).decode("utf-8", errors="ignore")
-                                obj = json.loads(decoded)
-                                if obj.get("type") == "content_block_delta":
-                                    delta = obj.get("delta", {}).get("text", "")
-                                    if delta:
-                                        yield delta
-                            except Exception:
-                                continue
-                    except Exception:
-                        continue
+        
+        if self.use_boto3:
+            async for delta in self._stream_boto3(payload):
+                yield delta
+        else:
+            async for delta in self._stream_bearer(payload):
+                yield delta
+
+    async def _stream_boto3(self, payload: dict):
+        """Stream using boto3's invoke_model_with_response_stream."""
+        try:
+            logger.debug("Bedrock: Starting boto3 streaming, model=%s", self.model)
+            
+            response = self.client.invoke_model_with_response_stream(
+                modelId=self.model,
+                contentType="application/json",
+                body=json.dumps(payload),
+            )
+            
+            for event in response.get("body").iter_events():
+                try:
+                    chunk = event.get("ContentBlockDelta")
+                    if chunk:
+                        delta = chunk.get("delta", {})
+                        if delta.get("type") == "text_delta":
+                            text = delta.get("text", "")
+                            if text:
+                                logger.debug("Bedrock: boto3 stream delta: %d chars", len(text))
+                                yield text
+                except Exception as e:
+                    logger.warning("Bedrock: Error processing boto3 event: %s", str(e)[:100])
+                    continue
+        except Exception as e:
+            logger.error("Bedrock: boto3 streaming failed: %s", str(e)[:300])
+            raise RuntimeError(f"Bedrock boto3 streaming error: {str(e)[:100]}")
+
+    async def _stream_bearer(self, payload: dict):
+        """Stream using bearer token via httpx.
+        
+        Note: Bedrock's event-stream format is complex binary protocol.
+        For bearer token auth, we use the non-streaming endpoint and emit word chunks.
+        """
+        try:
+            logger.debug("Bedrock: Bearer streaming - using non-streaming endpoint with word chunking")
+            
+            # Use regular invoke endpoint (not invoke-with-response-stream)
+            # because EventStream binary protocol is complex to parse manually
+            url = f"{self.endpoint}/model/{self.model}/invoke"
+            headers = {
+                "Authorization": f"Bearer {self.bearer}",
+                "Content-Type": "application/json",
+            }
+            
+            # Get full response first
+            async with httpx.AsyncClient(timeout=60.0) as cli:
+                r = await cli.post(url, headers=headers, content=json.dumps(payload))
+                r.raise_for_status()
+                data = r.json()
+            
+            logger.debug("Bedrock: Bearer response keys: %s", list(data.keys()))
+            
+            # Extract text from response
+            parts = data.get("content", [])
+            full_text = "".join(p.get("text", "") for p in parts if p.get("type") == "text")
+            
+            if not full_text:
+                logger.warning("Bedrock: Empty response content")
+                return
+            
+            logger.debug("Bedrock: Got %d chars, emitting word-by-word", len(full_text))
+            
+            # Emit word-by-word for streaming UX
+            words = full_text.split(" ")
+            for word in words:
+                yield word + " "
+        
+        except httpx.HTTPStatusError as e:
+            logger.error("Bedrock: Bearer token HTTP error %d: %s", e.response.status_code, e.response.text[:500])
+            raise RuntimeError(f"Bedrock API error {e.response.status_code}")
+        except Exception as e:
+            logger.error("Bedrock: Bearer token streaming failed: %s", str(e)[:300])
+            raise RuntimeError(f"Bedrock bearer streaming error: {str(e)[:100]}")
 
 
 class EmergentProvider:
@@ -227,7 +323,7 @@ class LLMService:
         raise RuntimeError(f"No LLM provider available: {last_err}")
 
     async def stream(self, messages: list[dict], system: str = "", max_tokens: int = 800):
-        """Async generator yielding text deltas. Falls back to chunked emission for Emergent."""
+        """Async generator yielding text deltas. Uses native Bedrock streaming when available, falls back to chunking."""
         import asyncio
         
         # Build provider order based on preference
@@ -245,7 +341,8 @@ class LLMService:
                     yield {"type": "delta", "text": delta, "provider": "bedrock"}
                 return
             except Exception as e:
-                logger.warning("Bedrock streaming failed: %s. Falling back to %s", e, order[1][0] if order[1][1].configured() else "error")
+                fallback = order[1][0] if len(order) > 1 and order[1][1].configured() else "none"
+                logger.warning("Bedrock streaming failed: %s. Falling back to %s", str(e)[:200], fallback)
 
         # Fallback: generate fully then emit in word chunks
         for prov_name, prov in order:
@@ -263,7 +360,7 @@ class LLMService:
                         await asyncio.sleep(0.015)
                 return
             except Exception as e:
-                logger.warning("Provider %s failed during streaming: %s", prov_name, e)
+                logger.warning("Provider %s failed during streaming: %s", prov_name, str(e)[:200])
                 continue
         
         logger.error("No LLM provider available")
