@@ -29,6 +29,7 @@ const NAV = [
   { to: "/nba", label: "Next Best Action", icon: <BoltRoundedIcon fontSize="small" />, roles: ["Rep", "Manager"] },
   { to: "/conversion", label: "Conversion", icon: <TrendingUpRoundedIcon fontSize="small" />, roles: ["Manager", "Executive"] },
   { to: "/territory", label: "Territory", icon: <MapRoundedIcon fontSize="small" />, roles: ["Manager", "Executive"] },
+  { to: "/manager/daily-plan", label: "Team Plans", icon: <GroupsRoundedIcon fontSize="small" />, roles: ["Manager", "Executive"] },
   { to: "/kol", label: "KOL Analytics", icon: <HubRoundedIcon fontSize="small" />, roles: ["Manager", "Executive"] },
   { to: "/chat", label: "Ask Data", icon: <ChatRoundedIcon fontSize="small" />, roles: ["Rep", "Manager", "Executive"] },
   { to: "/sources", label: "Source Explorer", icon: <StorageRoundedIcon fontSize="small" />, roles: ["Manager", "Executive"] },
@@ -74,9 +75,9 @@ export default function AppLayout({ children }) {
             </Typography>
           </Box>
           <Stack direction="row" spacing={1.5} alignItems="center">
-            {/* <Chip
+            <Chip
               size="small"
-              label="Bedrock + Emergent LLM"
+              label="Powered by AWS Bedrock"
               sx={{
                 bgcolor: "rgba(2,129,116,0.08)",
                 color: palette.primary,
@@ -84,7 +85,7 @@ export default function AppLayout({ children }) {
                 fontWeight: 600,
               }}
               data-testid="provider-chip"
-            /> */}
+            />
             <Tooltip title="Switch role">
               <Chip
                 onClick={(e) => setAnchor(e.currentTarget)}

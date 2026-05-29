@@ -2,14 +2,19 @@ import React, { useEffect, useState } from "react";
 import {
   Box, Card, CardContent, Grid, Typography, Stack, Chip, Avatar,
   Table, TableHead, TableRow, TableCell, TableBody, MenuItem, Select, FormControl, InputLabel,
+  CircularProgress,
 } from "@mui/material";
-import { RepApi, Conversion } from "../services/api";
+import { RepApi, Conversion, DailyPlanApi } from "../services/api";
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, RadarChart,
   PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
 } from "recharts";
 import SectionHeader from "../components/SectionHeader";
 import LoadingState from "../components/LoadingState";
+import DailyPlanSummaryWidget from "../components/DailyPlanSummaryWidget";
+import DailyPlanTimeline from "../components/DailyPlanTimeline";
+import DailyPlanDetailsDrawer from "../components/DailyPlanDetailsDrawer";
+import ExecutionCopilotWidget from "../components/ExecutionCopilotWidget";
 import { palette, chartPalette } from "../theme/kiwiTheme";
 import KPICard from "../components/KPICard";
 
@@ -18,6 +23,10 @@ export default function RepDashboard() {
   const [repId, setRepId] = useState("");
   const [detail, setDetail] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
+  const [dailyPlan, setDailyPlan] = useState(null);
+  const [selectedAction, setSelectedAction] = useState(null);
+  const [planLoading, setPlanLoading] = useState(false);
+  const [replanLoading, setReplanLoading] = useState(false);
 
   useEffect(() => {
     RepApi.list().then((rs) => {
@@ -28,8 +37,32 @@ export default function RepDashboard() {
   }, []);
 
   useEffect(() => {
-    if (repId) RepApi.detail(repId).then(setDetail);
+    if (repId) {
+      RepApi.detail(repId).then(setDetail);
+      setPlanLoading(true);
+      DailyPlanApi.detail(repId)
+        .then(setDailyPlan)
+        .finally(() => setPlanLoading(false));
+    }
   }, [repId]);
+
+  const hasCoachInsights = (narrative) => {
+    if (!narrative) return false;
+    return Boolean(
+      (narrative.morning_brief || "").trim() ||
+      (narrative.midday_review || "").trim() ||
+      (narrative.end_of_day_summary || "").trim() ||
+      (Array.isArray(narrative.today_focus) && narrative.today_focus.length > 0)
+    );
+  };
+
+  const handleReplan = () => {
+    if (!repId) return;
+    setReplanLoading(true);
+    DailyPlanApi.generate(repId, null, false)
+      .then(setDailyPlan)
+      .finally(() => setReplanLoading(false));
+  };
 
   if (!reps.length) return <LoadingState />;
   return (
@@ -114,6 +147,36 @@ export default function RepDashboard() {
               </CardContent>
             </Card>
           </Grid>
+
+          <Grid item xs={12}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={4}>
+                <DailyPlanSummaryWidget plan={dailyPlan} onReplan={handleReplan} loading={planLoading || replanLoading} />
+              </Grid>
+              <Grid item xs={12} md={8}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" sx={{ fontFamily: "Sora", mb: 2 }}>Today's AI Plan Timeline</Typography>
+                    {planLoading ? (
+                      <Box sx={{ py: 8, display: "grid", placeItems: "center" }}>
+                        <CircularProgress />
+                      </Box>
+                    ) : (
+                      <DailyPlanTimeline actions={dailyPlan?.actions} onSelect={setSelectedAction} />
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          {hasCoachInsights(dailyPlan?.ai_narrative) && (
+            <Grid item xs={12}>
+              <ExecutionCopilotWidget narrative={dailyPlan.ai_narrative} />
+            </Grid>
+          )}
+
+          <DailyPlanDetailsDrawer open={Boolean(selectedAction)} action={selectedAction} onClose={() => setSelectedAction(null)} />
 
           <Grid item xs={12} md={8}>
             <Card>

@@ -60,6 +60,15 @@ export const NBA = {
   simulate: (hcp_id, scenario) => api.get("/nba/simulate", { params: { hcp_id, scenario } }).then((r) => r.data),
 };
 
+export const DailyPlanApi = {
+  detail: (rep_id) => api.get(`/daily-plan/${rep_id}`, { params: { include_narrative: false } }).then((r) => r.data),
+  generate: (rep_id, plan_date, include_narrative = false) => api.post("/daily-plan/generate", { rep_id, plan_date, include_narrative }).then((r) => r.data),
+  updateStatus: (payload) => api.post("/daily-plan/update-status", payload).then((r) => r.data),
+  summary: (rep_id) => api.get("/daily-plan/summary", { params: { rep_id } }).then((r) => r.data),
+  managerView: (params = {}) => api.get("/daily-plan/manager-view", { params }).then((r) => r.data),
+  executionCoach: (rep_id) => api.get(`/daily-plan/execution-coach/${rep_id}`).then((r) => r.data),
+};
+
 export const Sources = {
   tables: () => api.get("/sources/tables").then((r) => r.data),
   table: (name, params) => api.get(`/sources/table/${name}`, { params }).then((r) => r.data),

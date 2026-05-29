@@ -13,14 +13,16 @@ import KOLAnalytics from "./pages/KOLAnalytics";
 import SourceExplorer from "./pages/SourceExplorer";
 import ConversationalAnalytics from "./pages/ConversationalAnalytics";
 import AdminSettings from "./pages/AdminSettings";
+import ManagerDailyPlanView from "./pages/ManagerDailyPlanView";
 
 export default function App() {
   return (
     <AppLayout>
       <Routes>
-        <Route path="/" element={<Navigate to="/executive" replace />} />
+        <Route path="/" element={<Navigate to="/rep" replace />} />
         <Route path="/executive" element={<ExecutiveDashboard />} />
         <Route path="/rep" element={<RepDashboard />} />
+        <Route path="/manager/daily-plan" element={<ManagerDailyPlanView />} />
         <Route path="/hcp" element={<HCPDirectory />} />
         <Route path="/hcp/:hcpId" element={<HCPDetail />} />
         <Route path="/briefing" element={<PreCallBriefing />} />

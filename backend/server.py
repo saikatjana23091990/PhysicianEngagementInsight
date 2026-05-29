@@ -22,7 +22,7 @@ from app.data.mongo import ensure_indexes
 from app.ai.vector_store import VectorStore
 from app.api import (
     health, kpi, hcp, rep, territory, conversion, kol,
-    briefing, nba, sources, chat, exec_dashboard, audit, export,
+    briefing, nba, sources, chat, exec_dashboard, audit, export, daily_plan,
 )
 
 
@@ -61,7 +61,7 @@ app.add_middleware(
 )
 
 for module in (health, kpi, hcp, rep, territory, conversion, kol, briefing, nba,
-               sources, chat, exec_dashboard, audit, export):
+               sources, chat, exec_dashboard, audit, export, daily_plan):
     app.include_router(module.router, prefix="/api")
 
 

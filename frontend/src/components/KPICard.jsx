@@ -21,15 +21,15 @@ export default function KPICard({ label, value, unit, sublabel, delta, trend = "
         }}
       />
       <CardContent sx={{ position: "relative" }}>
-        <Typography variant="overline" sx={{ color: palette.textMuted }}>
+        <Typography variant="caption" sx={{ color: palette.textMuted, textTransform: "uppercase", letterSpacing: 0.5 }}>
           {label}
         </Typography>
-        <Stack direction="row" alignItems="baseline" spacing={0.8} sx={{ mt: 0.5 }}>
-          <Typography variant="h3" sx={{ fontFamily: "Sora", color: accent, lineHeight: 1 }}>
+        <Stack direction="row" alignItems="baseline" spacing={0.7} sx={{ mt: 0.5 }}>
+          <Typography variant="h4" sx={{ fontFamily: "Sora", color: accent, lineHeight: 1 }}>
             {value}
           </Typography>
           {unit && (
-            <Typography variant="h6" sx={{ color: palette.textMuted }}>
+            <Typography variant="subtitle2" sx={{ color: palette.textMuted }}>
               {unit}
             </Typography>
           )}

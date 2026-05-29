@@ -53,6 +53,9 @@ async def ensure_indexes() -> None:
     await db.audit_logs.create_index([("category", 1), ("created_at", -1)])
     await db.audit_logs.create_index([("subject_id", 1)])
     await db.audit_logs.create_index([("created_at_dt", 1)], expireAfterSeconds=365 * 24 * 3600)
+    await db.daily_plan_history.create_index([("rep_id", 1), ("plan_date", 1)])
+    await db.daily_plan_history.create_index([("action_id", 1)])
+    await db.execution_plan_audit.create_index([("rep_id", 1), ("timestamp", -1)])
     await db.rag_chunks.create_index([("source_type", 1), ("hcp_id", 1)])
     await db.rag_chunks.create_index([("source_id", 1)], unique=False)
     logger.info("Mongo indexes ensured.")
@@ -101,6 +104,47 @@ async def log_audit(category: str, subject_id: str, action: str, detail: dict) -
         "detail": detail,
         "created_at": datetime.now(timezone.utc).isoformat(),
     })
+    return str(res.inserted_id)
+
+
+async def log_daily_plan_history(rep_id: str, plan_date: str, actions: list[dict], generated_timestamp: str) -> str:
+    from datetime import datetime, timezone
+    db = get_db()
+    payload = {
+        "rep_id": rep_id,
+        "plan_date": plan_date,
+        "generated_timestamp": generated_timestamp,
+        "actions": actions,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at_dt": datetime.now(timezone.utc),
+    }
+    res = await db.daily_plan_history.insert_one(payload)
+    return str(res.inserted_id)
+
+
+async def log_execution_plan_audit(
+    rep_id: str,
+    action_id: str,
+    old_priority: str,
+    new_priority: str,
+    reason: str,
+    trigger_event: str,
+    model_version: str,
+) -> str:
+    from datetime import datetime, timezone
+    db = get_db()
+    payload = {
+        "rep_id": rep_id,
+        "action_id": action_id,
+        "old_priority": old_priority,
+        "new_priority": new_priority,
+        "reason": reason,
+        "trigger_event": trigger_event,
+        "model_version": model_version,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "created_at_dt": datetime.now(timezone.utc),
+    }
+    res = await db.execution_plan_audit.insert_one(payload)
     return str(res.inserted_id)
 
 
