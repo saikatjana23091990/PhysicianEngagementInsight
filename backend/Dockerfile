@@ -5,6 +5,7 @@ WORKDIR ${LAMBDA_TASK_ROOT}
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt mangum
+RUN pip install emergentintegrations --extra-index-url https://d33sy5i8bnduwe.cloudfront.net/simple/
 
 COPY . ./
 
